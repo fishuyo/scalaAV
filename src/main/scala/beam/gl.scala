@@ -8,6 +8,7 @@ import javax.media.opengl._
 import javax.media.opengl.awt._
 import javax.media.opengl.glu._
 import com.jogamp.opengl.util._
+import javax.media.opengl.fixedfunc.{GLLightingFunc => L}
 
 trait GLDrawable {
   def onDraw( gl: GL2 ){}
@@ -18,13 +19,15 @@ object GLDraw {
   def sphere( r:Float =1.0f ) = {
 
   }
-  def cube( p:Vec3 = Vec3(0,0,0), s:Float=1.0f, wire:Boolean = true )( implicit gl:GL2 ) = {
+  def cube( p:Vec3 = Vec3(0,0,0), s:Float=1.0f, wire:Boolean = true, c:RGB = RGB.green )( implicit gl:GL2 ) = {
     import gl._
     glPushMatrix()
 
     glLineWidth(2.0f);
     glPolygonMode(GL.GL_FRONT_AND_BACK, GL2GL3.GL_LINE);
     glColor3f(0.0f,1.0f,0.0f);           // Set colour to green
+    //glMaterialfv(GL.GL_FRONT_AND_BACK, L.GL_AMBIENT_AND_DIFFUSE, Array(0.f, .8f, 0.f, 0.f), 0 );
+    glDisable( L.GL_LIGHTING )
 
     glTranslatef (p.x, p.y, p.z); // viewing transformation
     val scale = s / 2.0f;
@@ -69,7 +72,8 @@ object GLDraw {
     glTexCoord2f(1.0f, 1.0f); glVertex3f(-1.0f,  1.0f,  1.0f);
     glTexCoord2f(0.0f, 1.0f); glVertex3f(-1.0f,  1.0f, -1.0f);
     glEnd();
-    
+   
+    glEnable( L.GL_LIGHTING )
     glPolygonMode(GL.GL_FRONT_AND_BACK, GL2GL3.GL_FILL);
     glPopMatrix()
   }
@@ -100,7 +104,6 @@ class GLRenderWindow extends GLEventListener{
 
   def init(drawable: GLAutoDrawable) = { 
 
-    import javax.media.opengl.fixedfunc.{GLLightingFunc => L}
     //println( "init called." )
     val gl = drawable.getGL().getGL2();
     
@@ -110,7 +113,6 @@ class GLRenderWindow extends GLEventListener{
 
     //gl.glMaterialfv(GL.GL_FRONT, L.GL_SPECULAR, Array(1.f,1.f,1.f,1.f), 0  );
     //gl.glMaterialfv(GL.GL_FRONT, L.GL_SHININESS, Array(50.f), 0 );
-    gl.glMaterialfv(GL.GL_FRONT_AND_BACK, L.GL_AMBIENT_AND_DIFFUSE, Array(.8f, 0.f, 0.f, 0.f), 0 );
     gl.glLightfv(L.GL_LIGHT0, L.GL_POSITION, Array(0.f,0.f,0.f,0.f), 0 );
 
     gl.glEnable(L.GL_LIGHTING)
@@ -145,7 +147,9 @@ class GLRenderWindow extends GLEventListener{
 
   }
   def display(drawable: GLAutoDrawable) = { 
-  
+ 
+    RayTracer ! Step
+
     //println( "display called." )
     val gl = drawable.getGL().getGL2();
     Camera.step( 1.f/60.f);
@@ -153,6 +157,8 @@ class GLRenderWindow extends GLEventListener{
     val az = Camera.azimuth
     val el = Camera.elevation
 
+    gl.glMaterialfv(GL.GL_FRONT_AND_BACK, L.GL_AMBIENT_AND_DIFFUSE, Array(.8f, 0.f, 0.f, 0.f), 0 );
+    
     gl.glClear(GL.GL_COLOR_BUFFER_BIT | GL.GL_DEPTH_BUFFER_BIT);
     gl.glLoadIdentity();
     

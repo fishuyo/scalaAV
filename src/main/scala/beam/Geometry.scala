@@ -47,7 +47,6 @@ class Sphere( var cen: Vec3, val r: Double, material: Material ) extends Geometr
 
   
   override def intersect( ray: Ray ) : Hit = {
-
     val o_c = ray.o - cen
     val A = ray.d dot ray.d
     val B = 2 * ( ray.d dot o_c )
@@ -56,19 +55,23 @@ class Sphere( var cen: Vec3, val r: Double, material: Material ) extends Geometr
 
     if( det > 0 ){
       val t1 = (-B - math.sqrt(det).toFloat ) / (2*A)
-      if ( t1 > .1f ) return new Hit( this, ray, t1 )
+      if ( t1 > 0f ) return new Hit( this, ray, t1 )
       val t2 = (-B + math.sqrt(det).toFloat ) / (2*A)
-      if ( t2 > .1f ) return new Hit( this, ray, t2, true )
+      if ( t2 > 0f ) return new Hit( this, ray, t2, true )
 
     } else if ( det == 0 ){
       val t = -B / (2*A)
-      if ( t > .1f ) return new Hit( this, ray, t )
+      if ( t > 0f ) return new Hit( this, ray, t )
     }
     null
   }
 
   override def normalAt( p: Vec3) : Vec3 = (p - cen).normalize
   override def translate( d: Vec3 ) = (cen = cen + d)
+
+  override def onDraw( gl: GL2){
+    GLDraw.cube( cen, 2.f*r.toFloat)(gl)
+  }
 
 }
 
@@ -83,6 +86,7 @@ class Triangle( val vertices:(Vec3,Vec3,Vec3), material: Material ) extends Geom
     if( dn == 0) return null
 
     val t = -(( ray.o - vertices._1 ) dot n ) / dn
+    if( t < 0.f) return null
     val x = ray(t)
 
     if( (((vertices._2 - vertices._1) cross ( x - vertices._1 )) dot n) < 0 ||
@@ -90,7 +94,9 @@ class Triangle( val vertices:(Vec3,Vec3,Vec3), material: Material ) extends Geom
         (((vertices._1 - vertices._3) cross ( x - vertices._3 )) dot n) < 0 ) return null
 
     return new Hit( this, ray, t )
+    
   }
+  
   override def normalAt( p: Vec3) : Vec3 = normal
 
   override def onDraw( gl: GL2 ) = {
@@ -206,9 +212,9 @@ class TriangleMesh( material: Material) extends Geometry(material) {
   override def translate( v: Vec3 ) = for (i <- 0 until vertices.length ) vertices(i) += v
 
   override def intersect( ray: Ray ) : Hit = {
-    println("TriMesh: intersect")
+    //println("TriMesh: intersect")
     val hits = triangles.map( _.intersect(ray) ).collect({case h:Hit => h})
-    println( hits.size + " " + hits.first )
+    //println( hits.size + " " + hits.first )
     hits.size match {
       case 0 => null
       case _ =>  hits.min //( Ordering[Double].on[Hit]( { case h:Hit => h.t; case _ => java.lang.Double.MAX_VALUE }) )

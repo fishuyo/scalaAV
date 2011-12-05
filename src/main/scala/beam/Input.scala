@@ -55,6 +55,13 @@ object Input extends KeyListener with MouseListener with MouseMotionListener {
 		if (keyCode == KeyEvent.VK_DOWN) { Camera.lookDown; looking+=1 }
 		if (keyCode == KeyEvent.VK_LEFT) { Camera.lookLeft; looking+=1 }
 		if (keyCode == KeyEvent.VK_RIGHT) { Camera.lookRight; looking+=1 }
+
+    if( keyCode == KeyEvent.VK_O ) Convolver ! Write
+    if( keyCode == KeyEvent.VK_T) RayTracer.max_depth += 1
+    if( keyCode == KeyEvent.VK_G) RayTracer.max_depth -= 1
+    if( keyCode == KeyEvent.VK_Y) RayTracer.nrays += 10
+    if( keyCode == KeyEvent.VK_H) RayTracer.nrays -= 10
+
 	}
 
 	def keyReleased(e: KeyEvent) = {

@@ -10,12 +10,103 @@ import de.sciss.synth.io._
 
 //import de.gulden.framework.jjack._
 
-object EncodeAudio {
+object AudioOut { //extends JJackAudioProcessor  {
 
+  var source: SoundSource = null
+  var line : Option[SourceDataLine] = None
+  var format: Option[AudioFormat] = None
+
+
+  var bytes: Array[Byte] = null
   
+  //def process( e: JJackAudioEvent ) = {
+    
+    /*for ( i <- ( 0 until e.countChannels) ) {
+      val in = e.getInput(i);
+      val out = e.getOutput(i);
+      val cap = in.capacity();
+      for (j <- (0 until cap) ) {
+        var a = in.get(j);
+        //a *= v;
+        if (a > 1.0) {
+          a = 1.0f;
+        } else if(a < -1.0) {
+          a = -1.0f;
+        }
+        out.put(j, a);
+      }
+    }*/
+  //}
+  def setSource( s: SoundSource ) = {
+    source = s
+    open( s.format.getFormat )
+  }
+
+  def sampleRate = source.in.sampleRate
+  def open( format: AudioFormat, size: Int = 1024 ) = {
+    
+    line = Some( AudioSystem.getLine( new DataLine.Info( classOf[SourceDataLine], format)).asInstanceOf[SourceDataLine] )
+    this.format = Some( format )
+    line.get.open( format )
+
+  }
+
+  def start = line.get.start
+
+  def write( b: Array[Byte], off:Integer, len: Integer ) = line match { case Some(s) => s.write(b, off, len); case None => None }
+
+  def write( samples: Array[Float], off:Integer, len:Integer ) = {
+    //check line exists?
+
+    val numBytes = len * (format.get.getSampleSizeInBits() / 8);
+    if (bytes == null || numBytes > bytes.length)
+      bytes = new Array[Byte](numBytes)
+
+    // Convert doubles to bytes using format
+    encodeSamples(samples, bytes, len);
+
+    // write it
+    line.get.write(bytes, off, numBytes);
+  }
+
+  def encodeSamples( audioData: Array[Float], audioBytes: Array[Byte], length: Int) = {
+    var in: Int = 0
+    if (format.get.getSampleSizeInBits() == 16) {
+      if (format.get.isBigEndian()) {
+        for (i <- (0 until length) ) {
+          in = (audioData(i)*32767).toInt
+          /* First byte is MSB (high order) */
+          audioBytes.update(2*i, (in >> 8).toByte)
+          /* Second byte is LSB (low order) */
+          audioBytes.update(2*i+1, (in & 255).toByte)
+        }
+      } else {
+        for (i <- (0 until length) ) {
+          in = (audioData(i)*32767).toInt;
+          /* First byte is LSB (low order) */
+          audioBytes.update(2*i, (in & 255).toByte )
+          /* Second byte is MSB (high order) */
+          audioBytes.update(2*i+1, (in >> 8).toByte )
+        }
+      }
+    } else if (format.get.getSampleSizeInBits() == 8) {
+      if (format.get.getEncoding().toString().startsWith("PCM_SIGN")) {
+        for (i <- (0 until length) ) {
+          audioBytes.update(i, (audioData(i)*127).toByte)
+        }
+      } else {
+        for (i <- (0 until length) ) {
+          audioBytes.update(i, (audioData(i)*127+127).toByte)
+        }
+      }
+    }
+  }
+
+
+
 }
 
-class SAudioFile ( path: String) {
+/*class SAudioFile ( path: String) {
   
   //val stream = new AudioInputStream( new FileInputStream( path ) ) 
   val file = new File( path )
@@ -47,11 +138,11 @@ class SAudioFile ( path: String) {
     for (i <- (0 until channelSamples.length)) {
       channelSamples.update(i, interleavedSamples(nbChannels*i + channel));
     }
-  }
+  } 
 
   // Convenience method. Extract left and right channels for common stereo
   // files. leftSamples and rightSamples must be of size getSampleCount()
- /*def getStereoSamples(double[] leftSamples, double[] rightSamples) = {
+ def getStereoSamples(double[] leftSamples, double[] rightSamples) = {
     sampleCount = getNumSamples();
     double[] interleavedSamples = new double[(int)sampleCount*2];
     getInterleavedSamples(0, sampleCount, interleavedSamples);
@@ -59,7 +150,7 @@ class SAudioFile ( path: String) {
       leftSamples[i] = interleavedSamples[2*i];
       rightSamples[i] = interleavedSamples[2*i+1];
     }        
-  }*/
+  } ///
   // Private. Decode bytes of audioBytes into audioSamples
   def decodeBytes( audioBytes: Array[Byte], audioSamples: Array[Double]) {
     val sampleSizeInBytes = format.getSampleSizeInBits() / 8;
@@ -103,92 +194,6 @@ class SAudioFile ( path: String) {
   def play = AudioPlayer.player.start( stream )
   def stop = AudioPlayer.player.stop( stream )
     
-}
-
-object AudioOut { //extends JJackAudioProcessor  {
-
-  var line : Option[SourceDataLine] = None
-  var format: Option[AudioFormat] = None
-
-  var bytes: Array[Byte] = null
-
-  //def process( e: JJackAudioEvent ) = {
-    
-    /*for ( i <- ( 0 until e.countChannels) ) {
-      val in = e.getInput(i);
-      val out = e.getOutput(i);
-      val cap = in.capacity();
-      for (j <- (0 until cap) ) {
-        var a = in.get(j);
-        //a *= v;
-        if (a > 1.0) {
-          a = 1.0f;
-        } else if(a < -1.0) {
-          a = -1.0f;
-        }
-        out.put(j, a);
-      }
-    }*/
-  //}
-  
-  def open( format: AudioFormat, size: Int = 1024 ) = {
-    
-    line = Some( AudioSystem.getLine( new DataLine.Info( classOf[SourceDataLine], format)).asInstanceOf[SourceDataLine] )
-    this.format = Some( format )
-    line.get.open( format )
-
-  }
-
-  def write( b: Array[Byte], off:Integer, len: Integer ) = line match { case Some(s) => s.write(b, off, len); case None => None }
-
-  def write( samples: Array[Float] ) = {
-    //check line exists?
-
-    val sampleCount = samples.length
-    val numBytes = sampleCount * (format.get.getSampleSizeInBits() / 8);
-    if (bytes == null || numBytes > bytes.length)
-      bytes = new Array[Byte](numBytes)
-
-    // Convert doubles to bytes using format
-    encodeSamples(samples, bytes, sampleCount);
-
-    // write it
-    line.get.write(bytes, 0, numBytes);
-  }
-
-  def encodeSamples( audioData: Array[Float], audioBytes: Array[Byte], length: Int) = {
-    var in: Int = 0
-    if (format.get.getSampleSizeInBits() == 16) {
-      if (format.get.isBigEndian()) {
-        for (i <- (0 until length) ) {
-          in = (audioData(i)*32767).toInt
-          /* First byte is MSB (high order) */
-          audioBytes.update(2*i, (in >> 8).toByte)
-          /* Second byte is LSB (low order) */
-          audioBytes.update(2*i+1, (in & 255).toByte)
-        }
-      } else {
-        for (i <- (0 until length) ) {
-          in = (audioData(i)*32767).toInt;
-          /* First byte is LSB (low order) */
-          audioBytes.update(2*i, (in & 255).toByte )
-          /* Second byte is MSB (high order) */
-          audioBytes.update(2*i+1, (in >> 8).toByte )
-        }
-      }
-    } else if (format.get.getSampleSizeInBits() == 8) {
-      if (format.get.getEncoding().toString().startsWith("PCM_SIGN")) {
-        for (i <- (0 until length) ) {
-          audioBytes.update(i, (audioData(i)*127).toByte)
-        }
-      } else {
-        for (i <- (0 until length) ) {
-          audioBytes.update(i, (audioData(i)*127+127).toByte)
-        }
-      }
-    }
-  }
+}*/
 
 
-
-}

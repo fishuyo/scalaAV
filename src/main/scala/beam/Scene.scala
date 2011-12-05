@@ -59,11 +59,11 @@ object Scene {
   val lights = new ListBuffer[LightSource]
   val sounds = new ListBuffer[SoundSource]
 
-  var drawSoundSources = true
+  //var drawSoundSources = true
 
   def push( o: Geometry) = objects += o
   def push( l: LightSource) = { lights += l; if(l.g != null) objects += l.g }
-  def push( s: SoundSource) = sounds += s
+  def push( s: SoundSource) = { sounds += s; objects += s }
 
   def intersect( ray: Ray ) : Hit = {
 
@@ -87,7 +87,7 @@ object Scene {
 
   def onDraw( gl: GL2 ) = {
     objects.foreach( o => o.onDraw(gl) )
-    if( drawSoundSources ) sounds.foreach( s => s.onDraw(gl) )
+    //if( drawSoundSources ) sounds.foreach( s => s.onDraw(gl) )
   }
 
   def initCubeRoom( s:Float = 10.f, p:Vec3 = Vec3( 0,0,0 ) ) = {
@@ -117,18 +117,35 @@ object Scene {
     
     push( mesh )
 
-    val sound = new SoundSource( Vec3(5,0,-5), "acoustics.wav" )
+    val sound = new SoundSource( Vec3(2.5f,0,-2.5), "acoustics.wav" )
     push( sound )
+
+    AudioOut.setSource( sound )
   }
 
 }
 
-class SoundSource( val pos: Vec3, path: String) extends GLDrawable {
+class SoundSource( pos: Vec3, path: String) extends Sphere(pos, .1f, Emmiter(RGB.green)) {
  
   val in = AudioFile.openRead( path )
   val format = AudioSystem.getAudioFileFormat( in.file.get )
 
-  override def onDraw( gl: GL2 ){
-    GLDraw.cube( pos, .1f )(gl)
-  } 
+  val b = in.buffer( 1024 )
+  var left = in.numFrames
+  //val impulses = new Array[Float](1024)
+
+  def read(out: Array[Float] ) = {
+    in.read( b )
+    Array.copy( b(0), 0, out, 0, 1024 )
+  }
+  
+  /*def addImpulse( i:(Float,Float) ) = {
+    val speed = 343.f
+    val t = i._1 / speed * AudioOut.sampleRate //delay in samples
+    val v = i._2 //attenuation
+  
+    val i = t.toInt
+    impulses.update(i, v + impulses(i))
+  } */
+
 } 

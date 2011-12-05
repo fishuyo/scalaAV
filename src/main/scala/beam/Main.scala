@@ -19,19 +19,14 @@ object Main extends App{
 
   val window = new GLRenderWindow
   
+  RayTracer.start
+  RayTracer ! Rays(100)
 
-  //partition scene
+  Convolver.start
+  AudioOut.start
 
-  //build beam tree
-
-
-  val sound = new SAudioFile( "acoustics.wav" )
-  val in = AudioFile.openRead( "acoustics.wav" )
-
-  //val samples = sound.getSamples
-  
-  AudioOut.open( sound.stream.getFormat ) 
-  AudioOut.line.get.start
+  //AudioOut.open( ) 
+  //AudioOut.start
   //JJackSystem.setProcessor( AudioOut )
 
   //run loop
@@ -39,7 +34,7 @@ object Main extends App{
   //while(true){}
   //AudioOut.write( samples )
   
-  val size = 1024
+  /*val size = 1024
   val b = in.buffer( size )
   var left = in.numFrames
   while( left > 0 ){
@@ -47,23 +42,8 @@ object Main extends App{
     in.read( b )
     AudioOut.write( b(0) )
     left -= n
-  }
-
-
-  /*var nbytes=0
-  var len=1024
-  val buf = new Array[Byte](len*4)
-  while(nbytes != -1){
-  
-    nbytes = sound.stream.read( buf, 0, len )
-    
-    if( nbytes > 0 )
-      AudioOut.write( buf, 0, nbytes ) 
   }*/
 
-//  AudioOut.line.get.drain
-
-//  AudioOut.line.get.close
 
 }
 

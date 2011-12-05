@@ -8,13 +8,16 @@ class Ray( val o: Vec3, val d: Vec3 ){
  override def toString() = o + " -> " + d
 }
 
-class Beam( val o: Vec3, val d: (Vec3,Vec3,Vec3,Vec3) ){
+class Beam( val r: (Ray,Ray,Ray,Ray) ){
   
   implicit val context = Context.best
 
-  val x = CLArray( d._1.x, d._2.x, d._3.x, d._4.x )
-  val y = CLArray( d._1.y, d._2.y, d._3.y, d._4.y )
-  val z = CLArray( d._1.z, d._2.z, d._3.z, d._4.z )
+  val ox = CLArray( r._1.o.x, r._2.o.x, r._3.o.x, r._4.o.x )
+  val oy = CLArray( r._1.o.y, r._2.o.y, r._3.o.y, r._4.o.y )
+  val oz = CLArray( r._1.o.z, r._2.o.z, r._3.o.z, r._4.o.z )
+  val dx = CLArray( r._1.d.x, r._2.d.x, r._3.d.x, r._4.d.x )
+  val dy = CLArray( r._1.d.y, r._2.d.y, r._3.d.y, r._4.d.y )
+  val dz = CLArray( r._1.d.z, r._2.d.z, r._3.d.z, r._4.d.z )
 
 
 
