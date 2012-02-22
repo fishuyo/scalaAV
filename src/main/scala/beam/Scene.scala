@@ -117,10 +117,10 @@ object Scene {
     
     push( mesh )
 
-    val sound = new SoundSource( Vec3(2.5f,0,-2.5), "acoustics.wav" )
-    push( sound )
+    //val sound = new SoundSource( Vec3(2.5f,0,-2.5), "acoustics.wav" )
+    //push( sound )
 
-    AudioOut.setSource( sound )
+    //AudioOut.setSource( sound )
   }
 
 }

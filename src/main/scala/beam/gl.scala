@@ -24,10 +24,12 @@ object GLDraw {
     glPushMatrix()
 
     glLineWidth(2.0f);
-    glPolygonMode(GL.GL_FRONT_AND_BACK, GL2GL3.GL_LINE);
-    glColor3f(0.0f,1.0f,0.0f);           // Set colour to green
-    //glMaterialfv(GL.GL_FRONT_AND_BACK, L.GL_AMBIENT_AND_DIFFUSE, Array(0.f, .8f, 0.f, 0.f), 0 );
-    glDisable( L.GL_LIGHTING )
+    if( wire ) glPolygonMode(GL.GL_FRONT_AND_BACK, GL2GL3.GL_LINE);
+    else glPolygonMode(GL.GL_FRONT_AND_BACK, GL2GL3.GL_FILL );
+
+    //glColor3f(c.r,c.g,c.b);           // Set colour to green
+    glMaterialfv(GL.GL_FRONT_AND_BACK, L.GL_AMBIENT_AND_DIFFUSE, Array(c.r, c.g, c.b, 0.f), 0 );
+    //glDisable( L.GL_LIGHTING )
 
     glTranslatef (p.x, p.y, p.z); // viewing transformation
     val scale = s / 2.0f;
@@ -109,7 +111,7 @@ class GLRenderWindow extends GLEventListener{
     
     gl.glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
     //gl.glLightModeli(GL2ES1.GL_LIGHT_MODEL_TWO_SIDE, GL.GL_TRUE )
-    gl.glShadeModel(L.GL_FLAT);
+    gl.glShadeModel(L.GL_SMOOTH);
 
     //gl.glMaterialfv(GL.GL_FRONT, L.GL_SPECULAR, Array(1.f,1.f,1.f,1.f), 0  );
     //gl.glMaterialfv(GL.GL_FRONT, L.GL_SHININESS, Array(50.f), 0 );
@@ -148,7 +150,7 @@ class GLRenderWindow extends GLEventListener{
   }
   def display(drawable: GLAutoDrawable) = { 
  
-    RayTracer ! Step
+    //RayTracer ! Step
 
     //println( "display called." )
     val gl = drawable.getGL().getGL2();
@@ -168,7 +170,9 @@ class GLRenderWindow extends GLEventListener{
     gl.glTranslatef( -p.x, -p.y, -p.z )
 
     //gl.glScalef( .1f, .1f, .1f )
-    Scene.onDraw( gl )
+    //Scene.onDraw( gl )
+    ParticleCollector.step( 1.f/60.f );
+    ParticleCollector.onDraw( gl )
 
     gl.glFlush()
   

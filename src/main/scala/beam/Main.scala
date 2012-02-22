@@ -19,11 +19,11 @@ object Main extends App{
 
   val window = new GLRenderWindow
   
-  RayTracer.start
-  RayTracer ! Rays(100)
+  //RayTracer.start
+  //RayTracer ! Rays(100)
 
-  Convolver.start
-  AudioOut.start
+  //Convolver.start
+  //AudioOut.start
 
   //AudioOut.open( ) 
   //AudioOut.start
