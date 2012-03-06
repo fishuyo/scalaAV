@@ -1,5 +1,7 @@
-
-package beam
+package com.fishuyo
+package ray
+import maths._
+import graphics._
 
 import scala.io.Source
 import scala.util.parsing.combinator.RegexParsers

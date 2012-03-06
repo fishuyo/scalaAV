@@ -1,5 +1,6 @@
 
-package beam
+package com.fishuyo
+package maths
 
 class Point3( val x: Double, val y: Double, val z: Double){
   
@@ -15,13 +16,15 @@ class Vec3( var x: Float, var y: Float, var z: Float ){
   def *(s: Float ) = Vec3(s*x, s*y, s*z)
   //def *=(ss: Double) = { val s = ss.toFloat; x*=s; y*=s; z*=s } 
   def *=(s: Float) = { x*=s; y*=s; z*=s }
-
+  def /(s: Float ) = Vec3(x/s, y/s, z/s)
+  
   def dot(v: Vec3) : Float = x*v.x + y*v.y + z*v.z
   def cross( v: Vec3) = Vec3( y*v.z - z*v.y, z*v.x - x*v.z, x*v.y - y*v.x )
   def magSq() = this dot this
   def mag() = math.sqrt( magSq() ).toFloat
   def normalize() = this * (1.0f / mag() )
 
+  def zero() = {x=0;y=0;z=0}
   override def toString() = "[" + x + " " + y + " " + z + "]"
 }
 

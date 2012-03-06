@@ -1,5 +1,9 @@
 
-package beam
+package com.fishuyo
+package graphics
+import maths._
+import ray._
+import io._
 
 import java.nio.FloatBuffer
 import javax.swing._
@@ -143,7 +147,7 @@ class GLRenderWindow extends GLEventListener{
     gl.glViewport(0, 0, width, hh);
     gl.glMatrixMode(fixedfunc.GLMatrixFunc.GL_PROJECTION);
     gl.glLoadIdentity();
-    glu.gluPerspective(60.0f, h, .5, 20.0f);
+    glu.gluPerspective(60.0f, h, 0.01f, 20.0f);
     gl.glMatrixMode(fixedfunc.GLMatrixFunc.GL_MODELVIEW);
     gl.glLoadIdentity();
 
@@ -171,8 +175,11 @@ class GLRenderWindow extends GLEventListener{
 
     //gl.glScalef( .1f, .1f, .1f )
     //Scene.onDraw( gl )
-    ParticleCollector.step( 1.f/60.f );
-    ParticleCollector.onDraw( gl )
+    //ParticleCollector.step( 1.f/60.f );
+    //ParticleCollector.onDraw( gl )
+
+    trees.Trees.step( 1.f/60.f )
+    trees.Trees.onDraw( gl )
 
     gl.glFlush()
   

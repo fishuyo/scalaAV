@@ -1,5 +1,5 @@
 
-name := "beam"
+name := "what"
 
 version := "1.0"
 
@@ -15,4 +15,4 @@ autoCompilerPlugins := true
 
 addCompilerPlugin("com.nativelibs4java" % "scalacl-compiler-plugin" % "0.2")
 
-mainClass := Some("beam.Main")
+mainClass := Some("com.fishuyo.Main")

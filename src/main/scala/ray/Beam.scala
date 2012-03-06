@@ -1,5 +1,6 @@
-
-package beam
+package com.fishuyo
+package ray
+import maths.Vec3
 
 import scalacl._
 

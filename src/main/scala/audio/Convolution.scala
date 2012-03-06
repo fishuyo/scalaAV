@@ -1,5 +1,7 @@
 
-package beam
+package com.fishuyo
+package audio
+import ray._
 
 import actors.Actor
 import actors._

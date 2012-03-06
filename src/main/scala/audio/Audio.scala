@@ -1,5 +1,8 @@
 
-package beam
+package com.fishuyo
+package audio
+
+import ray._
 
 import java.io._
 import java.nio.FloatBuffer

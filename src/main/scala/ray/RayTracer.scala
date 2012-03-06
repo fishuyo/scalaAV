@@ -1,4 +1,8 @@
-package beam 
+package com.fishuyo
+package ray
+import maths.Vec3
+import graphics._
+import audio._
 
 import actors.Actor
 import actors.Actor._
@@ -114,7 +118,7 @@ object RayTracer extends Actor {
     val sinPhi2 = ior * ior * ( 1 - cosTheta * cosTheta )
     if ( sinPhi2 > 1.0 ) return null
 
-    val t = ( ((d + (hit.norm * cosTheta)) * ior) - ( hit.norm *  math.sqrt( 1 - sinPhi2 ).toFloat ) )
+    val t = ( ((d + (hit.norm * cosTheta)) * ior) - ( hit.norm *  scala.math.sqrt( 1 - sinPhi2 ).toFloat ) )
 
     val o = hit.point + t * 0.01f
     

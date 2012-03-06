@@ -1,4 +1,7 @@
-package beam
+
+package com.fishuyo
+package graphics
+
 /* 
 RGB class based on code from the scalaray project
 http://sourceforge.net/projects/scalaray/

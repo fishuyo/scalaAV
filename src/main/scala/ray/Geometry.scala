@@ -1,5 +1,7 @@
-
-package beam
+package com.fishuyo
+package ray
+import maths._
+import graphics._
 
 import scala.collection.mutable.ListBuffer
 import javax.media.opengl._
@@ -27,7 +29,7 @@ case class Emmiter( c: RGB ) extends Material
 /**
 * Geometries
 */
-abstract class Geometry(var material: Material ) extends GLDrawable {
+abstract class Geometry(var material: Material ) extends graphics.GLDrawable {
 
   var color = RGB.red
   material match { 

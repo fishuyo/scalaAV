@@ -1,5 +1,7 @@
 
-package beam
+package com.fishuyo
+import maths._
+import graphics._
 
 import javax.media.opengl._
 import javax.media.opengl.fixedfunc.{GLLightingFunc => L}
@@ -89,6 +91,39 @@ object ParticleCollector {
     val out = new java.io.FileWriter( file )
 
     collection.foreach( (p) => {
+      val s = .01f
+      val x = p.pos.x; val y = p.pos.y; val z = p.pos.z;
+
+      out.write( x + " " + y + " " + (z+s) + " 0 0 1\n" )
+      out.write( x + " " + y + " " + (z-s) + " 0 0 -1\n" )
+      out.write( x + " " + (y+s) + " " + z + " 0 1 0\n" )
+      out.write( x + " " + (y-s) + " " + z + " 0 -1 0\n" )
+      out.write( (x+s) + " " + y + " " + z + " 1 0 0\n" )
+      out.write( (x-s) + " " + y + " " + z + " -1 0 0\n" )
+
+    })
+
+    out.close
+  }
+  
+  def writePoints2D( file: String) = {
+    
+    val out = new java.io.FileWriter( file )  
+    
+    var r=0.f
+    var list = List[Particle]()
+
+    while( r < 2 * math.Pi ){
+      val tx = math.cos( r ).toFloat
+      val tz = math.sin( r ).toFloat
+      collection.foreach( (p) => {
+        list = new Particle( Vec3( tx*p.pos.x, p.pos.y, tz*p.pos.x ), Vec3(0) ) :: list
+      })
+      r += .5f;
+    }
+
+    
+    list.foreach( (p) => {
       val s = .01f
       val x = p.pos.x; val y = p.pos.y; val z = p.pos.z;
 

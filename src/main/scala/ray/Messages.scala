@@ -1,4 +1,5 @@
-package beam
+package com.fishuyo
+package ray
 
 case class Rays(n:Int)
 case class Step

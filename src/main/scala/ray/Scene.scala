@@ -1,5 +1,8 @@
 
-package beam
+package com.fishuyo
+package ray
+import maths._
+import graphics._
 
 import scala.collection.mutable.ListBuffer
 import javax.media.opengl._
@@ -14,7 +17,7 @@ import javax.sound.sampled._
 object Camera {
   val v = 2.f
   val a = 90.f
-  val rad = math.Pi / 180.f 
+  val rad = scala.math.Pi / 180.f 
   var position = Vec3(0,0,2)
   var velocity = Vec3(0,0,0)
   var direction = Vec3(0,0,0)

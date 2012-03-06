@@ -2,7 +2,9 @@
 *  Adapted from Input.java by iuiz found in
 *  morg.volumeshadow.exampleImplementation
 */
-package beam
+package com.fishuyo
+package io
+import ray._
 
 import java.awt.event.KeyEvent
 import java.awt.event.KeyListener
@@ -57,10 +59,11 @@ object Input extends KeyListener with MouseListener with MouseMotionListener {
 		if (keyCode == KeyEvent.VK_RIGHT) { Camera.lookRight; looking+=1 }
 
     if( keyCode == KeyEvent.VK_O ) ParticleCollector.writeOrientedPoints( "points.xyz" );
+    if( keyCode == KeyEvent.VK_P ) ParticleCollector.writePoints2D( "points_spun.xyz" );
     if( keyCode == KeyEvent.VK_T) RayTracer.max_depth += 1
     if( keyCode == KeyEvent.VK_G) RayTracer.max_depth -= 1
-    if( keyCode == KeyEvent.VK_Y) {ParticleCollector.thresh += .05f; println( ParticleCollector.thresh );} //RayTracer.nrays += 10
-    if( keyCode == KeyEvent.VK_H) {ParticleCollector.thresh -= .05f; println( ParticleCollector.thresh );} //RayTracer.nrays -= 10
+    if( keyCode == KeyEvent.VK_Y) {ParticleCollector.thresh += .01f; println( ParticleCollector.thresh );} //RayTracer.nrays += 10
+    if( keyCode == KeyEvent.VK_H) {ParticleCollector.thresh -= .01f; println( ParticleCollector.thresh );} //RayTracer.nrays -= 10
 
 	}
 

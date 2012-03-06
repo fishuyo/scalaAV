@@ -1,5 +1,5 @@
 
-package beam
+package com.fishuyo
 
 import javax.imageio._
 import java.io._
@@ -15,9 +15,9 @@ object Main extends App{
   implicit val context = Context.best
 
   //build scene
-  Scene.initCubeRoom()
+  ray.Scene.initCubeRoom()
 
-  val window = new GLRenderWindow
+  val window = new graphics.GLRenderWindow
   
   //RayTracer.start
   //RayTracer ! Rays(100)
