@@ -1,0 +1,22 @@
+
+package com.fishuyo
+package spatial
+
+import maths._
+
+trait Positionable {
+  var pos: Vec3
+}
+trait Orientable {
+  var quat: Quat
+}
+
+class Pose {
+  var pos: Vec3
+  var quat: Quat
+
+}
+
+trait Poseable extends Pose 
+
+
