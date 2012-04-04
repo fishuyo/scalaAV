@@ -2,8 +2,14 @@
 package com.fishuyo
 package maths
 
-class Point3( val x: Double, val y: Double, val z: Double){
-  
+object Vec3 {
+
+  def apply( v: Float) = new Vec3( v, v, v)
+  def apply( vv: Double) = { val v=vv.toFloat; new Vec3( v, v, v) }
+  def apply( x: Float, y: Float, z: Float) = new Vec3(x,y,z)
+  def apply( x: Double, y: Double, z: Double) =  new Vec3(x.toFloat,y.toFloat,z.toFloat) 
+
+  def unapply( v: Vec3): Some[(Float,Float,Float)] = Some((v.x,v.y,v.z))
 }
 
 class Vec3( var x: Float, var y: Float, var z: Float ){
@@ -28,13 +34,4 @@ class Vec3( var x: Float, var y: Float, var z: Float ){
   override def toString() = "[" + x + " " + y + " " + z + "]"
 }
 
-object Vec3 {
 
-  def apply( v: Float) = new Vec3( v, v, v)
-  def apply( vv: Double) = { val v=vv.toFloat; new Vec3( v, v, v) }
-  def apply( x: Float, y: Float, z: Float) = new Vec3(x,y,z)
-  def apply( x: Double, y: Double, z: Double) =  new Vec3(x.toFloat,y.toFloat,z.toFloat) 
-
-  def unapply( v: Vec3): Some[(Float,Float,Float)] = Some((v.x,v.y,v.z))
-
-}

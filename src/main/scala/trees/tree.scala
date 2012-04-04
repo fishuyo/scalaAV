@@ -7,28 +7,24 @@ import graphics._
 
 import javax.media.opengl._
 
-
-object Trees {
+object Trees extends GLAnimatable {
 
   var trees = List[TreeNode]( TreeNode(Vec3(0), .1f) )
   trees(0).branch( 6, 45.f, .8f, 0 )
-  def step( dt: Float ) = trees.foreach( _.step(dt) )
-  def onDraw( gl: GL2 ) = trees.foreach( _.onDraw(gl) )
+  override def step( dt: Float ) = trees.foreach( _.step(dt) )
+  override def onDraw( gl: GL2 ) = trees.foreach( _.onDraw(gl) )
 
 }
 
-
 object TreeNode {
-
   def apply( p:Vec3, d: Float ) = new TreeNode { pos = p; lPos = p; dist = d; pinned = true; } 
   def apply( p:TreeNode, ang: Float, d: Float, stif: Float =.5f ) = {
     val v = Vec3( math.cos( ang * math.Pi/180.f ), math.sin( ang * math.Pi/180.f ), util.Random.nextFloat * 2.f - 1.f ) * d + p.pos
     new TreeNode { parent = Some(p); pos = v; lPos = v; dist = d; stiff = stif; angles.z = ang; }
   }
-
 }
 
-class TreeNode extends graphics.GLDrawable {
+class TreeNode extends GLAnimatable {
 
   var pos = Vec3(0)
   var lPos = Vec3(0)
@@ -46,9 +42,9 @@ class TreeNode extends graphics.GLDrawable {
   var parent:Option[TreeNode] = None
   var children = List[TreeNode]()
 
-
   override def onDraw( gl: GL2 ) = {
     gl.glColor3f(1.f,1.f,1.f)
+    gl.glLineWidth( thick )
     gl.glBegin( GL.GL_LINES )
     children.foreach( (n) => { gl.glVertex3f(pos.x, pos.y, pos.z); gl.glVertex3f( n.pos.x, n.pos.y, n.pos.z ) } )
     gl.glEnd
@@ -56,7 +52,7 @@ class TreeNode extends graphics.GLDrawable {
     children.foreach( (n) => n.onDraw(gl) )
   }
 
-  def step( dt: Float ) = {
+  override def step( dt: Float ) = {
 
     if( !pinned ){
       accel += Vec3( 0, -10.f, 0 )

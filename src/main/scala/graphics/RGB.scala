@@ -2,20 +2,6 @@
 package com.fishuyo
 package graphics
 
-/* 
-RGB class based on code from the scalaray project
-http://sourceforge.net/projects/scalaray/
-*/
-
-class RGB(val r:Float, val g:Float, val b:Float){
-	def rgb() : Int = new java.awt.Color(Math.min(1,r),Math.min(1,g),Math.min(1,b)).getRGB()
-	def +(c: RGB) = new RGB(r+c.r, g+c.g, b+c.b)
-	def *(s:Float) = new RGB(r*s, g*s, b*s)
-	def *(c:RGB) = new RGB(r*c.r, g*c.g, b*c.b)
-	def /(s: Float) = this * (1/s)
-
-  override def toString() = "( " + r + " " + g + " " + b + " )"
-}
 
 object RGB {
   def apply( i: Float) = new RGB(i,i,i)
@@ -27,4 +13,22 @@ object RGB {
   val red = RGB(1,0,0)
   val green = RGB(0,1,0)
   val blue = RGB(0,0,1)
+}
+
+class RGB(val r:Float, val g:Float, val b:Float){
+	def rgb() : Int = new java.awt.Color(Math.min(1,r),Math.min(1,g),Math.min(1,b)).getRGB()
+	def +(c: RGB) = new RGB(r+c.r, g+c.g, b+c.b)
+	def *(s:Float) = new RGB(r*s, g*s, b*s)
+	def *(c:RGB) = new RGB(r*c.r, g*c.g, b*c.b)
+	def /(s: Float) = this * (1/s)
+
+  override def toString() = "( " + r + " " + g + " " + b + " )"
+}
+
+class RGBA( r:Float, g:Float, b:Float, val a:Float ) extends RGB(r,g,b){
+	def +(c: RGBA) = new RGBA(r+c.r, g+c.g, b+c.b, a+c.a)
+	override def *(s:Float) = new RGBA(r*s, g*s, b*s, a)
+	def *(c:RGBA) = new RGBA(r*c.r, g*c.g, b*c.b, a*c.a)
+
+  override def toString() = "( " + r + " " + g + " " + b + " " + a + " )"
 }

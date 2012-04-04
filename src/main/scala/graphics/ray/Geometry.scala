@@ -72,7 +72,7 @@ class Sphere( var cen: Vec3, val r: Double, material: Material ) extends Geometr
   override def translate( d: Vec3 ) = (cen = cen + d)
 
   override def onDraw( gl: GL2){
-    GLDraw.cube( cen, 2.f*r.toFloat)(gl)
+    GLDraw.cube( cen, Vec3(2.f*r.toFloat) )(gl)
   }
 
 }

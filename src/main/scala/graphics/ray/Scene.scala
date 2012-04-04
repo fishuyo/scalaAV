@@ -14,7 +14,7 @@ import javax.sound.sampled._
 /**
 * Camera
 */
-object Camera {
+object RCamera { //? demolish this...
   val v = 2.f
   val a = 90.f
   val rad = scala.math.Pi / 180.f 

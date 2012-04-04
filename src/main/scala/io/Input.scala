@@ -1,9 +1,7 @@
-/*
-*  Adapted from Input.java by iuiz found in
-*  morg.volumeshadow.exampleImplementation
-*/
+
 package com.fishuyo
 package io
+import graphics._
 import ray._
 
 import java.awt.event.KeyEvent

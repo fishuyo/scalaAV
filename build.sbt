@@ -15,4 +15,6 @@ autoCompilerPlugins := true
 
 addCompilerPlugin("com.nativelibs4java" % "scalacl-compiler-plugin" % "0.2")
 
+addSbtPlugin("com.github.philcali" % "sbt-lwjgl-plugin" % "3.1.1" )
+
 mainClass := Some("com.fishuyo.Main")
