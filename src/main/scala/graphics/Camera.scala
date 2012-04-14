@@ -9,9 +9,20 @@ import javax.media.opengl._
 * Camera
 */
 object Camera {
-  val v = 2.f
-  val a = 90.f
+
   val rad = scala.math.Pi / 180.f 
+  
+  var fovy = 60.f
+  var aspect = 1.f
+  var near = .01f
+  var far = 40.f
+  var t  = math.tan( fovy * rad / 2 )
+  var height = near * t
+  var width = height * aspect
+
+  var v = 2.f
+  var a = 90.f
+  
   var position = Vec3(0,0,2)
   var velocity = Vec3(0,0,0)
   var direction = Vec3(0,0,0)
@@ -21,6 +32,28 @@ object Camera {
   var azimuth=0.0f
   var roll=0.0f
   var w = Vec3( 0,0,0 ) //angluar velocity
+
+
+  def loadGLProjection( gl: GL2 ) = {
+    gl.glMatrixMode(fixedfunc.GLMatrixFunc.GL_PROJECTION)
+    gl.glLoadIdentity()
+    t = math.tan( fovy * rad / 2 )
+    height = near * t
+    width = height * aspect
+    gl.glFrustum(-width,width,-height,height,near,far);
+  }
+  
+  def loadGLModelview( gl: GL2 ) = {
+    gl.glMatrixMode(fixedfunc.GLMatrixFunc.GL_MODELVIEW)
+    gl.glLoadIdentity()
+    gl.glRotatef( elevation, 1.f, 0, 0 )
+    gl.glRotatef( azimuth, 0, 1.f, 0 )
+    gl.glTranslatef( -position.x, -position.y, -position.z )
+  }
+
+  def projectPoint( x: Float, y: Float ) : Vec3 = {
+    Vec3( width*(x-300+0.5)/300, height*(300-y+0.5)/300, position.z - near)
+  }
 
   def forward() = velocity = Vec3( math.sin( azimuth * rad),0, -math.cos(azimuth*rad) ).normalize * v
   def backward() = velocity = Vec3( math.sin( (180.f + azimuth) * rad),0, -math.cos((180.f+azimuth)*rad) ).normalize * v

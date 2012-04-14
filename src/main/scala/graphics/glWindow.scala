@@ -18,6 +18,7 @@ class GLRenderWindow extends GLEventListener{
   
   var scene = GLScene
   var camera = Camera
+  var input = Input
   var name = "scalaAV"
   var w=600
   var h=600
@@ -63,9 +64,9 @@ class GLRenderWindow extends GLEventListener{
 
     gl.setSwapInterval(1)
 
-    glcanvas.addKeyListener( Input )
-    glcanvas.addMouseListener( Input )
-    glcanvas.addMouseMotionListener( Input )
+    glcanvas.addKeyListener( input )
+    glcanvas.addMouseListener( input )
+    glcanvas.addMouseMotionListener( input )
 
   }
 
@@ -80,11 +81,9 @@ class GLRenderWindow extends GLEventListener{
     val h = width.toFloat / hh.toFloat;
     
     gl.glViewport(0, 0, width, hh);
-    gl.glMatrixMode(fixedfunc.GLMatrixFunc.GL_PROJECTION);
-    gl.glLoadIdentity();
-    glu.gluPerspective(60.0f, h, 0.01f, 20.0f);
-    gl.glMatrixMode(fixedfunc.GLMatrixFunc.GL_MODELVIEW);
-    gl.glLoadIdentity();
+    
+    camera.aspect = h
+    camera.loadGLProjection(gl)
 
   }
   def display(drawable: GLAutoDrawable) = { 
@@ -100,25 +99,13 @@ class GLRenderWindow extends GLEventListener{
     //gl.glMaterialfv(GL.GL_FRONT_AND_BACK, L.GL_AMBIENT_AND_DIFFUSE, Array(.8f, 0.f, 0.f, 0.f), 0 );
     
     gl.glClear(GL.GL_COLOR_BUFFER_BIT | GL.GL_DEPTH_BUFFER_BIT);
-    gl.glLoadIdentity();
     
-    //glu.gluLookAt(p.x,p.y,p.z, d.x,d.y,d.x, u.x,u.y,u.z )
-    gl.glRotatef( el, 1.f, 0, 0 )
-    gl.glRotatef( az, 0, 1.f, 0 )
-    gl.glTranslatef( -p.x, -p.y, -p.z )
+    camera.loadGLModelview(gl)
 
     //gl.glScalef( .1f, .1f, .1f )
     scene.onDraw( gl )
-    //ParticleCollector.step( 1.f/60.f );
-    //ParticleCollector.onDraw( gl )
-
-    //trees.Fabric.step( 1.f/60.f )
-    //trees.Fabric.onDraw( gl )
-    //trees.Trees.step( 1.f/60.f )
-    //trees.Trees.onDraw( gl )
 
     gl.glFlush()
-  
   }
   
   def displayChanged(drawable: GLAutoDrawable, modeChanged: Boolean, deviceChanged: Boolean) = { println( "displayChanged called." ) }

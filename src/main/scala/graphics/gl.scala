@@ -11,7 +11,11 @@ import javax.media.opengl.glu._
 import com.jogamp.opengl.util._
 import javax.media.opengl.fixedfunc.{GLLightingFunc => L}
 
-trait GLDrawable {
+trait GLThis {
+  def gl = GLContext.getCurrent.getGL
+}
+
+trait GLDrawable extends GLThis {
   def onDraw( gl: GL2 ){}
 }
 trait GLAnimatable extends GLDrawable {
@@ -85,5 +89,8 @@ object GLDraw {
     glPopMatrix()
   }
 
+  def rect = {
+
+  }
 }
 

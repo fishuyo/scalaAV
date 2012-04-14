@@ -2,6 +2,7 @@
 package com.fishuyo
 package io
 import graphics._
+import maths._
 import ray._
 
 import java.awt.event.KeyEvent
@@ -10,7 +11,7 @@ import java.awt.event.MouseEvent
 import java.awt.event.MouseListener
 import java.awt.event.MouseMotionListener
 
-import javax.media.opengl.GLAutoDrawable
+//import javax.media.opengl.GLAutoDrawable
 
 object Input extends KeyListener with MouseListener with MouseMotionListener {
 
@@ -89,10 +90,20 @@ object Input extends KeyListener with MouseListener with MouseMotionListener {
 	}
 
 	def mousePressed(e: MouseEvent) = {
-		/*int x = mouseEvent.getX();
-		int y = mouseEvent.getY();
-		this.mouseClickX = x;
-		this.mouseClickY = y;*/
+		
+    /*val x = e.getX();
+		val y = e.getY();
+    println( x + " " + y )
+
+    val e = Camera.position
+    val v = Camera.projectPoint( x, y )
+    println( v )
+   
+    val r = new Ray( e, v-e )
+    val xx = r(200.f).x + 1.f
+*/
+		//lastx = x;
+		//lasty = y;
 	}
 
 	def mouseClicked(e: MouseEvent) = {

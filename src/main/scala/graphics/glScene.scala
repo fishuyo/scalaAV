@@ -9,10 +9,8 @@ import javax.media.opengl._
 /**
 * Singleton scene object to contain list of scene drawables
 */
-object GLScene extends GLScene {
-  
+object GLScene extends GLScene
 
-}
 class GLScene {
 
   val drawable = new ListBuffer[GLDrawable]
