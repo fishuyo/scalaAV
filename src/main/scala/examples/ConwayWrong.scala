@@ -1,6 +1,6 @@
 
 package com.fishuyo
-package examples.conway
+package examples.conwaywrong
 
 import graphics._
 import maths._
@@ -62,7 +62,6 @@ object Input extends KeyListener with MouseListener with MouseMotionListener {
   def keyPressed( e: KeyEvent ) = {
     val keyCode = e.getKeyCode()
     if( keyCode == KeyEvent.VK_ENTER ) Main.field.sstep(0)
-    //if( keyCode == KeyEvent.VK_M ) Main.win.capture()
   }
   def keyReleased( e: KeyEvent ) = {}
   def keyTyped( e: KeyEvent ) = {}
@@ -98,7 +97,7 @@ class ConwayField extends Field2D {
   def sstep(dt: Float) = {
 
     if( next == null ){
-      next = FloatBuffer.allocate( data.capacity ) //data.duplicate //new Array[Float](w*h);
+      next = data.duplicate //new Array[Float](w*h);
     }
 
     for( y <- (0 until h); x <- (0 until w)){
@@ -116,12 +115,12 @@ class ConwayField extends Field2D {
         if( count == 2 || count == 3) next.put(y*w+x,1.f)
         else {
         next.put(y*w+x,0.f)
-        //println( x + " " + y + " dieing")
+        println( x + " " + y + " dieing")
         }
       }else if( this(x,y) == 0.f) { //was dead
         if( count == 3 ){
           next.put(y*w+x,1.f)
-          //println( x + " " + y + " born")
+          println( x + " " + y + " born")
         }
         else next.put(y*w+x,0.f)
       }

@@ -52,7 +52,7 @@ object Camera {
   }
 
   def projectPoint( x: Float, y: Float ) : Vec3 = {
-    Vec3( width*(x-300+0.5)/300, height*(300-y+0.5)/300, position.z - near)
+    Vec3( width*(x-300.f+0.5)/300.f, height*(300.f-y+0.5f)/300.f, position.z - near)
   }
 
   def forward() = velocity = Vec3( math.sin( azimuth * rad),0, -math.cos(azimuth*rad) ).normalize * v

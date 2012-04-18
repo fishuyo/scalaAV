@@ -12,6 +12,7 @@ import javax.media.opengl._
 import javax.media.opengl.awt._
 import javax.media.opengl.glu._
 import com.jogamp.opengl.util._
+import com.jogamp.opengl.util.awt.Screenshot
 import javax.media.opengl.fixedfunc.{GLLightingFunc => L}
 
 class GLRenderWindow extends GLEventListener{
@@ -26,7 +27,10 @@ class GLRenderWindow extends GLEventListener{
 
   val profile = GLProfile.get(GLProfile.GL2);
   val capabilities = new GLCapabilities(profile);
-         
+  
+  var capture = false
+  var cap_num = 0
+
   // The canvas is the widget that's drawn in the JFrame
   val glcanvas = new GLCanvas(capabilities);
   glcanvas.addGLEventListener(this);

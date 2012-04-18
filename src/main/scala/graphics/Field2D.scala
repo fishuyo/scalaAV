@@ -7,7 +7,7 @@ import com.jogamp.common.nio.Buffers
 import java.nio.FloatBuffer
 
 object Field2D {
-  def apply(width:Int, height:Int ) = new Field2D { w=width; h=height; data = Buffers.newDirectFloatBuffer( w*h ); }
+  def apply(width:Int, height:Int ) = new Field2D { w=width; h=height; }
 }
 
 class Field2D extends GLAnimatable {
@@ -15,7 +15,9 @@ class Field2D extends GLAnimatable {
   var data:FloatBuffer = _
   var w:Int = _
   var h:Int = _
+  if( w > 0 && h > 0 ) data = Buffers.newDirectFloatBuffer(w*h)
 
+  def apply( i:Int ) = data.get(i)
   def apply( x:Int, y:Int ) = data.get( w*y + x)
   def getToroidal( i:Int, j:Int ) = {
     var x = i; var y = j;
@@ -25,11 +27,28 @@ class Field2D extends GLAnimatable {
   }
 
   def allocate( x:Int, y:Int ) = { w=x; h=y; data = Buffers.newDirectFloatBuffer( w*h ); }
+  def set( i:Int, v:Float ) = data.put( i, v )
   def set( x:Int, y:Int, v:Float) = data.put( w*y + x, v)
   def set( a: Array[Float] ) = {
     //should check array size matches field size
     data.put( a )
     data.rewind
+  }
+
+  def normalize() = {
+
+    var max = 0.0f
+    var min = data.get(0)
+    for ( x <- ( 0 until data.capacity )){
+      val v = data.get(x)
+      if( v > max ) max = v
+      if( v < min ) min = v
+    }
+  
+    val range = 1.0f / (max - min)
+    for ( x <- (0 until data.capacity) ){
+      data.put(x, (data.get(x) - min) * range)
+    }  
   }
 
   override def onDraw( gl: GL2 ) = {

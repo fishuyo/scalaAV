@@ -1,6 +1,6 @@
 
 package com.fishuyo
-package examples.conway
+package examples.conwayfloat
 
 import graphics._
 import maths._
@@ -9,6 +9,7 @@ import ray._
 import java.awt.event._
 import java.nio._
 import com.jogamp.common.nio.Buffers
+import com.jogamp.opengl.util.awt.Screenshot
 
 object Input extends KeyListener with MouseListener with MouseMotionListener {
 
@@ -62,7 +63,7 @@ object Input extends KeyListener with MouseListener with MouseMotionListener {
   def keyPressed( e: KeyEvent ) = {
     val keyCode = e.getKeyCode()
     if( keyCode == KeyEvent.VK_ENTER ) Main.field.sstep(0)
-    //if( keyCode == KeyEvent.VK_M ) Main.win.capture()
+    if( keyCode == KeyEvent.VK_M ) Main.win.capture = !Main.win.capture
   }
   def keyReleased( e: KeyEvent ) = {}
   def keyTyped( e: KeyEvent ) = {}
@@ -72,7 +73,7 @@ object Input extends KeyListener with MouseListener with MouseMotionListener {
 
 object Main extends App {
 
-  val n = 100;
+  val n = 60;
   val field = new ConwayField
   field.allocate(n,n)
 
@@ -93,7 +94,6 @@ object Main extends App {
 class ConwayField extends Field2D {
   
   var next: FloatBuffer = _ //Array[Float] = _
-
   
   def sstep(dt: Float) = {
 
@@ -103,28 +103,34 @@ class ConwayField extends Field2D {
 
     for( y <- (0 until h); x <- (0 until w)){
       
-      var count = 0;
+      var count = 0.f;
       for( j <- (-1 to 1); i <- (-1 to 1)){
-        count += getToroidal(x+i,y+j).toInt
+        count += getToroidal(x+i,y+j)
         //count += this(x+i,y+j).toInt
       }
       //println( count );
       
       //was alive
-      if( this(x,y) > 0.f ){
-        count -= 1
-        if( count == 2 || count == 3) next.put(y*w+x,1.f)
+      val v = this(x,y)
+      var newv = v;
+      if( v > 0.f ){
+        count -= v 
+        if( count >= 2.f && count <= 3.f) newv += .1f
         else {
-        next.put(y*w+x,0.f)
-        //println( x + " " + y + " dieing")
+          newv -= .1f
+          //println( x + " " + y + " dieing")
         }
-      }else if( this(x,y) == 0.f) { //was dead
-        if( count == 3 ){
-          next.put(y*w+x,1.f)
+      }else if( v == 0.f) { //was dead
+        if( count >= 2.5f && count <= 3.f ){
+          newv = .1f
           //println( x + " " + y + " born")
         }
-        else next.put(y*w+x,0.f)
+        else newv= 0.f
       }
+      
+      if( newv > 1.f ) newv = 1.f;
+      if( newv < 0.f ) newv = 0.f;
+      next.put(y*w+x, newv)
     }
 
     for( i <- (0 until next.capacity)) set(i, next.get(i))
