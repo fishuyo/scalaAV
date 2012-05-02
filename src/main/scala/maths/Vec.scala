@@ -20,6 +20,7 @@ class Vec3( var x: Float, var y: Float, var z: Float ){
   def unary_- = Vec3( -x, -y, -z ) 
   //def *(ss: Double) = { val s = ss.toFloat; Vec3(s*x, s*y, s*z) }
   def *(s: Float ) = Vec3(s*x, s*y, s*z)
+  def *(v: Vec3 ) = Vec3(v.x*x, v.y*y, v.z*z)
   //def *=(ss: Double) = { val s = ss.toFloat; x*=s; y*=s; z*=s } 
   def *=(s: Float) = { x*=s; y*=s; z*=s }
   def /(s: Float ) = Vec3(x/s, y/s, z/s)

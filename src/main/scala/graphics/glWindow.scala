@@ -4,9 +4,11 @@ package graphics
 import maths._
 //import ray._
 import io._
+import media._
 
 import java.nio.FloatBuffer
 import javax.swing._
+import java.awt.image.BufferedImage
 
 import javax.media.opengl._
 import javax.media.opengl.awt._
@@ -28,7 +30,7 @@ class GLRenderWindow extends GLEventListener{
   val profile = GLProfile.get(GLProfile.GL2);
   val capabilities = new GLCapabilities(profile);
   
-  var capture = false
+  var capture: MediaWriter = _
   var cap_num = 0
 
   // The canvas is the widget that's drawn in the JFrame
@@ -110,10 +112,15 @@ class GLRenderWindow extends GLEventListener{
     scene.onDraw( gl )
 
     gl.glFlush()
+
+    if( capture != null ) capture.addFrame( this.getImage() )
   }
   
   def displayChanged(drawable: GLAutoDrawable, modeChanged: Boolean, deviceChanged: Boolean) = { println( "displayChanged called." ) }
   def dispose( drawable: GLAutoDrawable ) = { println( "dispose called." ) }
 
+  def getImage() : BufferedImage = {
+    Screenshot.readToBufferedImage(0,0,w,h,false)
+  }
 
 }

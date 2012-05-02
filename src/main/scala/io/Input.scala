@@ -42,16 +42,18 @@ object Input extends KeyListener with MouseListener with MouseMotionListener {
       moving += 1
     }
 		if (keyCode == KeyEvent.VK_SPACE) {
-//			Camera.up
-//      moving += 1
+			Camera.up
+      moving += 1
 		}
 		if (keyCode == KeyEvent.VK_SHIFT) {
-//      Camera.down
-//      moving += 1
+      Camera.down
+      moving += 1
     }
 		if (keyCode == KeyEvent.VK_Q) {
 			//this.rotation = !rotation;
 		}
+    if (keyCode == KeyEvent.VK_BACK_QUOTE) Camera.initialPosition()
+
 		if (keyCode == KeyEvent.VK_UP) { Camera.lookUp; looking+=1 }
 		if (keyCode == KeyEvent.VK_DOWN) { Camera.lookDown; looking+=1 }
 		if (keyCode == KeyEvent.VK_LEFT) { Camera.lookLeft; looking+=1 }

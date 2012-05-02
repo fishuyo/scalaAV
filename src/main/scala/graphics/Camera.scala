@@ -55,6 +55,7 @@ object Camera {
     Vec3( width*(x-300.f+0.5)/300.f, height*(300.f-y+0.5f)/300.f, position.z - near)
   }
 
+  def initialPosition() = { position = Vec3(0,0,2); elevation=0.f; azimuth=0.f }
   def forward() = velocity = Vec3( math.sin( azimuth * rad),0, -math.cos(azimuth*rad) ).normalize * v
   def backward() = velocity = Vec3( math.sin( (180.f + azimuth) * rad),0, -math.cos((180.f+azimuth)*rad) ).normalize * v
   def left() = velocity = Vec3( math.sin( (270.f + azimuth) * rad),0, -math.cos((270.f+azimuth)*rad) ).normalize * v

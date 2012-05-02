@@ -1,6 +1,6 @@
 
 package com.fishuyo
-package examples.conwayfloat
+package examples.mandlebrotcolor
 
 import graphics._
 import maths._
@@ -28,7 +28,7 @@ object Input extends KeyListener with MouseListener with MouseMotionListener {
     val xx = ((r(200.f).x + 1.f) * Main.n/2).toInt  
     val yy = ((r(200.f).y + 1.f) * Main.n/2).toInt 
     println( xx + " " + yy )
-    if( xx >= 0 && xx <= Main.n-1 && yy >= 0 && yy <= Main.n-1 ) Main.field.set( xx,yy, 1.f )
+    //if( xx >= 0 && xx <= Main.n-1 && yy >= 0 && yy <= Main.n-1 ) Main.field.set( xx,yy, 1.f )
   }
 
   def mouseClicked( e: MouseEvent) = {}
@@ -45,15 +45,7 @@ object Input extends KeyListener with MouseListener with MouseMotionListener {
     val xx = ((r(200.f).x + 1.f) * Main.n/2).toInt  
     val yy = ((r(200.f).y + 1.f) * Main.n/2).toInt 
     if( xx >= 0 && xx <= Main.n-1 && yy >= 0 && yy <= Main.n-1 ){
-      var count = 0;
-      for( j <- (-1 to 1); i <- (-1 to 1)){
-        count += Main.field.getToroidal(xx+i,yy+j).toInt
-        //count += this(xx+i,yy+j).toInt
-      }
-      //println( count );
-      if( Main.field(xx,yy) > 0.0f ) count -= 1
-
-      println( "("+xx+", "+ yy+" ) : " + count );
+      println( "("+xx+", "+ yy+" ) : " + Main.field(xx,yy) );
     }
   }
   def mouseDragged( e: MouseEvent) = {
@@ -62,8 +54,8 @@ object Input extends KeyListener with MouseListener with MouseMotionListener {
   
   def keyPressed( e: KeyEvent ) = {
     val keyCode = e.getKeyCode()
-    if( keyCode == KeyEvent.VK_ENTER ) Main.field.sstep(0)
-    if( keyCode == KeyEvent.VK_M ) Main.win.capture = !Main.win.capture
+    //if( keyCode == KeyEvent.VK_ENTER ) Main.field.sstep(0)
+    //if( keyCode == KeyEvent.VK_M ) Main.win.capture = !Main.win.capture
   }
   def keyReleased( e: KeyEvent ) = {}
   def keyTyped( e: KeyEvent ) = {}
@@ -73,14 +65,10 @@ object Input extends KeyListener with MouseListener with MouseMotionListener {
 
 object Main extends App {
 
-  val n = 60;
-  val field = new ConwayField
+  val n = 1000;
+  val field = new MandlebrotField
   field.allocate(n,n)
-
-  //field.set( Array(1.0f, 0.f,0.f,0.f,0.f,1.f,0.f,0.f,0.f,0.f,1.f,0.f,0.f,0.f,0.f,1.f ));
-  //field.set( 2, 2, 1.f );
-  //field.set( 3, 2, 1.f );
-  //field.set( 4, 2, 1.f );
+  field.calculate();
 
   GLScene.push( field );
 
@@ -91,49 +79,42 @@ object Main extends App {
 
 }
 
-class ConwayField extends Field2D {
+class MandlebrotField extends Vec3Field2D {
   
   var next: FloatBuffer = _ //Array[Float] = _
   
-  def sstep(dt: Float) = {
-
-    if( next == null ){
-      next = FloatBuffer.allocate( data.capacity ) //data.duplicate //new Array[Float](w*h);
-    }
+  def calculate() = {
 
     for( y <- (0 until h); x <- (0 until w)){
+      var p = Vec3( x * 6.f / w - 3.f, y * 6.f / h - 3.f, 0);
+      var o = Vec3(0) + p
       
-      var count = 0.f;
-      for( j <- (-1 to 1); i <- (-1 to 1)){
-        count += getToroidal(x+i,y+j)
-        //count += this(x+i,y+j).toInt
+      var t = 0;
+
+      while( p.mag < 20.f && t < 100 ){
+        var xx = p.x*p.x - p.y*p.y
+        var yy = 2*p.x*p.y
+        p = Vec3( xx, yy, 0)
+        //p = Vec3( p.x*p.x, p.y*p.y, 0)
+        p += o
+        t += 1
       }
-      //println( count );
-      
-      //was alive
-      val v = this(x,y)
-      var newv = v;
-      if( v > 0.f ){
-        count -= v 
-        if( count >= 2.f && count <= 3.f) newv += .1f
-        else {
-          newv -= .1f
-          //println( x + " " + y + " dieing")
-        }
-      }else if( v == 0.f) { //was dead
-        if( count >= 2.5f && count <= 3.f ){
-          newv = .1f
-          //println( x + " " + y + " born")
-        }
-        else newv= 0.f
-      }
-      
-      if( newv > 1.f ) newv = 1.f;
-      if( newv < 0.f ) newv = 0.f;
-      next.put(y*w+x, newv)
+      var v = t.toFloat - (math.log(math.log(p.mag))/math.log(2.f)).toFloat
+      //var v = (math.log(math.sqrt(p.x*p.x+p.y*p.y))/math.pow(2.f, t)).toFloat
+      if( v.isNaN ) v = t
+      if( v.isInfinite ) v = 0.f
+
+      set(y,h-1-x, Vec3(v,v,v) )
     }
 
-    for( i <- (0 until next.capacity)) set(i, next.get(i))
+    normalize();
+    for( i<-(0 until w*h)) set(i, color(this(i).x) )
+  }
+
+  def color( x: Float ) : Vec3 = {
+
+    Vec3(1,0,0) * x + Vec3(0,1,0) * (1-x)
 
   }
+
 }
