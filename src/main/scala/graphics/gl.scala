@@ -15,6 +15,8 @@ trait GLThis {
   def gl = GLContext.getCurrent.getGL
 }
 
+trait G extends GL2
+
 trait GLDrawable extends GLThis {
   def onDraw( gl: GL2 ){}
 }

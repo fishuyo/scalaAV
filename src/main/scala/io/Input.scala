@@ -1,6 +1,7 @@
 
 package com.fishuyo
 package io
+
 import graphics._
 import maths._
 import ray._
@@ -11,16 +12,13 @@ import java.awt.event.MouseEvent
 import java.awt.event.MouseListener
 import java.awt.event.MouseMotionListener
 
-//import javax.media.opengl.GLAutoDrawable
-
-object Input extends KeyListener with MouseListener with MouseMotionListener {
+object NavInput extends KeyMouseListener {
 
   var moving = 0
   var looking = 0
 
-	def keyPressed(e: KeyEvent) = {
+	override def keyPressed(e: KeyEvent) = {
 		val keyCode = e.getKeyCode();
-    //println( "keypressed: " + keyCode )
 
 		if (keyCode == KeyEvent.VK_ESCAPE) {
 			System.exit(0);
@@ -59,16 +57,9 @@ object Input extends KeyListener with MouseListener with MouseMotionListener {
 		if (keyCode == KeyEvent.VK_LEFT) { Camera.lookLeft; looking+=1 }
 		if (keyCode == KeyEvent.VK_RIGHT) { Camera.lookRight; looking+=1 }
 
-    if( keyCode == KeyEvent.VK_O ) ParticleCollector.writeOrientedPoints( "points.xyz" );
-    if( keyCode == KeyEvent.VK_P ) ParticleCollector.writePoints2D( "points_spun.xyz" );
-    if( keyCode == KeyEvent.VK_T) RayTracer.max_depth += 1
-    if( keyCode == KeyEvent.VK_G) RayTracer.max_depth -= 1
-    if( keyCode == KeyEvent.VK_Y) {ParticleCollector.thresh += .01f; println( ParticleCollector.thresh );} //RayTracer.nrays += 10
-    if( keyCode == KeyEvent.VK_H) {ParticleCollector.thresh -= .01f; println( ParticleCollector.thresh );} //RayTracer.nrays -= 10
-
 	}
 
-	def keyReleased(e: KeyEvent) = {
+	override def keyReleased(e: KeyEvent) = {
 		val k = e.getKeyCode();
 
 		if (k == KeyEvent.VK_W || k == KeyEvent.VK_S || k == KeyEvent.VK_A || k == KeyEvent.VK_D || k == KeyEvent.VK_SPACE || k == KeyEvent.VK_SHIFT) {
@@ -79,21 +70,19 @@ object Input extends KeyListener with MouseListener with MouseMotionListener {
 		}
 	}
 
-	def keyTyped(e: KeyEvent) = {
-	}
-
+/*
 	def mouseReleased(e: MouseEvent) = {
-		/*int x = e.getX();
+		int x = e.getX();
 		int y = e.getY();
 		this.mouseClickX = x;
 		this.mouseClickY = y;
 
-		this.dragging = false;*/
+		this.dragging = false;
 	}
 
 	def mousePressed(e: MouseEvent) = {
 		
-    /*val x = e.getX();
+    val x = e.getX();
 		val y = e.getY();
     println( x + " " + y )
 
@@ -103,7 +92,7 @@ object Input extends KeyListener with MouseListener with MouseMotionListener {
    
     val r = new Ray( e, v-e )
     val xx = r(200.f).x + 1.f
-*/
+
 		//lastx = x;
 		//lasty = y;
 	}
@@ -118,7 +107,7 @@ object Input extends KeyListener with MouseListener with MouseMotionListener {
 	}
 
 	def mouseMoved(e: MouseEvent) = {
-		/*int x = e.getX();
+		int x = e.getX();
 		int y = e.getY();
 		int dx = Math.abs(x - this.mouseClickX);
 		int dy = Math.abs(y - this.mouseClickY);
@@ -142,9 +131,24 @@ object Input extends KeyListener with MouseListener with MouseMotionListener {
 		this.mouseClickX = x;
 
 		this.mouseClickY = y;
-	*/
+	
   }
 
-	def mouseDragged(e: MouseEvent) = {
-	}
+	def mouseDragged(e: MouseEvent) = {}*/
+}
+
+trait KeyMouseListener extends KeyListener with MouseListener with MouseMotionListener {
+
+  def mouseReleased( e: MouseEvent) = {}
+  def mousePressed( e: MouseEvent) = {}
+  def mouseClicked( e: MouseEvent) = {}
+  def mouseEntered( e: MouseEvent) = {}
+  def mouseExited( e: MouseEvent) = {}
+  def mouseMoved( e: MouseEvent) = {}
+  def mouseDragged( e: MouseEvent) = {}
+
+  def keyPressed( e: KeyEvent ) = {}
+  def keyReleased( e: KeyEvent ) = {}
+  def keyTyped( e: KeyEvent ) = {}
+
 }

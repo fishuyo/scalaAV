@@ -88,7 +88,7 @@ object Scene {
     
   }
 
-  def onDraw( gl: GL2 ) = {
+  def onDraw( gl: G ) = {
     objects.foreach( o => o.onDraw(gl) )
     //if( drawSoundSources ) sounds.foreach( s => s.onDraw(gl) )
   }

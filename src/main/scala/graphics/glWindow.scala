@@ -21,7 +21,7 @@ class GLRenderWindow extends GLEventListener{
   
   var scene = GLScene
   var camera = Camera
-  var input = Input
+  var input = NavInput
   var name = "scalaAV"
   var w=600
   var h=600
@@ -95,12 +95,12 @@ class GLRenderWindow extends GLEventListener{
   def display(drawable: GLAutoDrawable) = { 
  
     val gl = drawable.getGL().getGL2();
-    camera.step( 1.f/60.f);
+    camera.step( 1.f/fps.toFloat);
     val p = camera.position
     val az = camera.azimuth
     val el = camera.elevation
 
-    scene.step( 1.f/60.f);
+    scene.step( 1.f/fps.toFloat);
 
     //gl.glMaterialfv(GL.GL_FRONT_AND_BACK, L.GL_AMBIENT_AND_DIFFUSE, Array(.8f, 0.f, 0.f, 0.f), 0 );
     
@@ -123,4 +123,9 @@ class GLRenderWindow extends GLEventListener{
     Screenshot.readToBufferedImage(0,0,w,h,false)
   }
 
+  def addKeyMouseListener( l: KeyMouseListener ) = { 
+    glcanvas.addKeyListener(l)
+    glcanvas.addMouseListener(l)
+    glcanvas.addMouseMotionListener(l)
+  }
 }

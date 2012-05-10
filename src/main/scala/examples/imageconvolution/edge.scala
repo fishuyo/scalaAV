@@ -19,48 +19,17 @@ import com.jogamp.opengl.util.awt.Screenshot
 object Input extends KeyListener with MouseListener with MouseMotionListener {
 
   def mouseReleased( e: MouseEvent) = {}
-  def mousePressed( e: MouseEvent) = {
-
-    val x = e.getX
-    val y = e.getY
-    println( x + " " + y )
-    
-    val o = Camera.position
-    val v = Camera.projectPoint( x, y )
-    println( v )
-    
-    val r = new Ray( o, v-o )
-    val xx = ((r(200.f).x + 1.f) * Main.n/2).toInt  
-    val yy = ((r(200.f).y + 1.f) * Main.n/2).toInt 
-    println( xx + " " + yy )
-    //if( xx >= 0 && xx <= Main.n-1 && yy >= 0 && yy <= Main.n-1 ) Main.field.set( xx,yy, 1.f )
-  }
-
+  def mousePressed( e: MouseEvent) = {}
   def mouseClicked( e: MouseEvent) = {}
   def mouseEntered( e: MouseEvent) = {}
   def mouseExited( e: MouseEvent) = {}
-  def mouseMoved( e: MouseEvent) = {
-    val x = e.getX
-    val y = e.getY
-    
-    val o = Camera.position
-    val v = Camera.projectPoint( x, y )
-    
-    val r = new Ray( o, v-o )
-    val xx = ((r(200.f).x + 1.f) * Main.n/2).toInt  
-    val yy = ((r(200.f).y + 1.f) * Main.n/2).toInt 
-    if( xx >= 0 && xx <= Main.n-1 && yy >= 0 && yy <= Main.n-1 ){
-      println( "("+xx+", "+ yy+" ) : " + Main.field(xx,yy) );
-    }
-  }
-  def mouseDragged( e: MouseEvent) = {
-    mousePressed(e);
-  }
+  def mouseMoved( e: MouseEvent) = {}
+  def mouseDragged( e: MouseEvent) = {}
   
   def keyPressed( e: KeyEvent ) = {
     val keyCode = e.getKeyCode()
     if( keyCode == KeyEvent.VK_ENTER ){
-      Main.field.sstep(0)
+      Main.field.sstep(.01f)
     }
     if( keyCode == KeyEvent.VK_M ){
       //Main.field.go = !Main.field.go
@@ -73,11 +42,19 @@ object Input extends KeyListener with MouseListener with MouseMotionListener {
     if( keyCode == KeyEvent.VK_R ){
       Main.field.readImage( "input.png" )
     }
+    if( keyCode == KeyEvent.VK_1 ) Main.field.k = 0
+    if( keyCode == KeyEvent.VK_2 ) Main.field.k = 1
+    if( keyCode == KeyEvent.VK_3 ) Main.field.k = 2
+    if( keyCode == KeyEvent.VK_4 ) Main.field.k = 3
+    if( keyCode == KeyEvent.VK_5 ) Main.field.k = 4
+    if( keyCode == KeyEvent.VK_6 ) Main.field.k = 5
+    if( keyCode == KeyEvent.VK_7 ) Main.field.k = 6
+    if( keyCode == KeyEvent.VK_F ) Main.field.alpha += .05f
+    if( keyCode == KeyEvent.VK_V ) Main.field.alpha -= .05f
+    println("alpha = " + Main.field.alpha)
   }
   def keyReleased( e: KeyEvent ) = {}
   def keyTyped( e: KeyEvent ) = {}
-
-
 }
 
 object Main extends App {
@@ -97,30 +74,49 @@ object Main extends App {
 
 class EdgeField extends Field2D {
   
-  val colors = Array( Vec3(.3,.7,.1), Vec3(.6, .1, .1), Vec3( .1, 0,.8), Vec3( 1,.9,.9))
-  var walk = (0,0) //Vec3(0) //Field2D
-  var c = Vec3(1)
-
-  val next = new Vec3Field2D
+  val next = new Field2D
+  val kernals = List[List[Float]]( Kernel.edgeEnhance, Kernel.edgeDetect, Kernel.emboss, Kernel.sharpen, Kernel.blur, Kernel.gaus, Kernel.laplacian )
+  var alpha = .1f
+  var k = 0
 
   override def sstep(dt:Float) = {
 
-    if( next.w == 0 ) next.allocate( w,h )
+    if( next.w != w || next.h != h ) next.allocate( w,h )
 
-  
+    for( y <- ( 1 to h-2 ); x <- ( 1 to w-2 )){
+      
+      var v = multiplyKernel(x,y, kernals(k) )
+      if(k == 6 ) v = this(x,y) + dt * alpha * v 
+      next.set( x,y,v ) 
+    }
+ 
+    for( i <- ( 0 until w*h ) ) set(i, next(i) )
   }
 
-  def color( x: Float ) : Vec3 = {
+  def multiplyKernel( x:Int, y:Int, l: List[Float] ) : Float = {
 
-    var i = math.abs(2*x*colors.length-1).toInt - 1
-    if( i < 0 ) i = 0
-    if( i >= colors.length-1) i = colors.length-2
-    val c1 = colors(i)
-    val c2 = colors(i+1)
-    c1 * (1-x) + c2 * (x)
-
+    var s = math.sqrt(l.length).toInt //assume square kernel
+    s = s / 2
+    var v = 0.f
+    var c = 0
+    for( j<-(-s to s); i<-(-s to s)){
+      v += l(c) * getToroidal(x+i,y+j)
+      c += 1
+    }
+    v
   }
 
 }
 
+object Kernel {
+  def dx2 = List(0.f,0,0, 1,-2,1, 0,0,0 )
+  def dy2 = List(0.f,1,0, 0,-2,0, 0,1,0 )
+  def laplacian = List(0.f,1,0, 1,-4,1, 0,1,0 )
+  def edgeEnhance = List(0.f,0.f,0.f,-1.f,1.f,0.f,0.f,0.f,0.f)
+  def edgeDetect = List(0.f,1.f,0.f,1.f,-4.f,1.f,0.f,1.f,0.f)
+  def emboss = List(-2.f,-1.f,0.f,-1.f,1.f,1.f,0.f,1.f,2.f)
+  def sharpen = List(0.f,0.f,0.f,0.f,0.f, 0.f,0.f,-1.f,0.f,0.f, 0.f,-1.f,5.f,-1.f,0.f, 0.f,0.f,-1.f,0.f,0.f, 0.f,0.f,0.f,0.f,0.f)
+  def blur = List(0.f,0.f,0.f,0.f,0.f, 0.f,1.f,1.f,1.f,0.f, 0.f,1.f,1.f,1.f,0.f, 0.f,1.f,1.f,1.f,0.f, 0.f,0.f,0.f,0.f,0.f)
+  def gaus = List(.25f,.25f,.25f,.25f,-2.f,.25f,.25f,.25f,.25f)
 
+}

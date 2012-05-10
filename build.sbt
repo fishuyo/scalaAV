@@ -15,8 +15,11 @@ resolvers ++= Seq(
 libraryDependencies ++= Seq(
   "org.scala-lang" % "scala-swing" % "2.9.1",
   "com.nativelibs4java" % "scalacl" % "0.2",
-  "xuggle" % "xuggle-xuggler" % "5.4"
+  "xuggle" % "xuggle-xuggler" % "5.4",
   //"org.scalala" %% "scalala" % "1.0.0.RC3-SNAPSHOT"
+  "log4j" % "log4j" % "1.2.16",
+  "net.sf.bluecove" % "bluecove" % "2.1.0",
+  "net.sf.bluecove" % "bluecove-gpl" % "2.1.0"
 )
 
 
@@ -27,3 +30,9 @@ addCompilerPlugin("com.nativelibs4java" % "scalacl-compiler-plugin" % "0.2")
 addSbtPlugin("com.github.philcali" % "sbt-lwjgl-plugin" % "3.1.1" )
 
 mainClass := Some("com.fishuyo.Main")
+
+//fork in run := true
+
+//javaOptions in run += "-Dbluecove.native.path=/usr/lib/java/"
+
+//javaOptions in run += "-d32"
