@@ -24,35 +24,36 @@ object Main extends App {
 
 }
 
-class ReactDiffuseField extends Field2D {
+class ReactDiffuseField extends Vec3Field2D {
   
-  val next = new Field2D
 
+  val next = new Field2D
   type RA = List[Float]
-  val chemFields = new ChemField( .0002f, (l:RA) => -l(0)*l(1)*l(1) + .05f*(1-l(0)) ) :: new ChemField( .00001f, (l:RA) => l(0)*l(1)*l(1) - (.05f+.0675f)*l(1)) :: List()
+  val chemFields = new ChemField( .0002f, (l:RA) => -l(0)*l(1)*l(1) + .05f*(1-l(0)) ) :: new ChemField( .0001f, (l:RA) => l(0)*l(1)*l(1) - (.05f+.0675f)*l(1)) :: List()
   val dx = 2.f / Main.n
 
   override def allocate( w:Int, h:Int ) = {
     super.allocate(w,h)
     chemFields.foreach( _.allocate(w,h) )
+    next.allocate(w,h)
   }
 
   override def sstep(dt:Float) = {
+    val s = 10;
+    for( j <- (-s to s); i <- (-s to s) ) chemFields(1).set( w/2+i, h/2+j, 1.f )
 
-    for( j <- (-5 to 5); i <- (-5 to 5) ) chemFields(1).set( w/2+i, h/2+j, 1.f )
-
-    if( next.w != w || next.h != h ) next.allocate( w,h )
 
     for( y <- ( 0 to h-1 ); x <- ( 0 to w-1 )){
       
       chemFields.foreach( _.diffuse(x,y,.1f) )
       chemFields.foreach( _.react( chemFields, x, y, .1f ) )
       
-      var v = 0.f
-      chemFields.foreach(  f => v += f(x,y) )
+      var v =chemFields.map(  f => f(x,y) )
 
-      set(x,y,v)
+      set(x,y,Vec3(0,v(0),v(1)) )
     }
+    
+    chemFields.foreach( _.updateField )
  
     //for( i <- ( 0 until w*h ) ) set(i, next(i) )
   }
@@ -60,19 +61,27 @@ class ReactDiffuseField extends Field2D {
 
 class ChemField( var alpha:Float, val reactFunc: (List[Float])=>Float )  extends Field2D {
 
+  val next = new Field2D
   val dx = 2.f / Main.n
+
+  override def allocate( w:Int, h:Int ) = {
+    super.allocate(w,h)
+    next.allocate(w,h)
+  }
 
   def diffuse( x: Int, y:Int, dt:Float ) = {
     var v = multiplyKernel(x,y, Kernel.laplacian )
     v = this(x,y) + v * dt * alpha / (dx*dx)
-    set(x,y,v)
+    next.set(x,y,v)
   }
 
   def react( chemFields:List[ChemField], x:Int, y:Int, dt:Float ) = {
     val l = chemFields.map( (f) => f(x,y) )
-    var v = this(x,y) + dt * reactFunc(l)
-    set(x,y,v)
+    var v = next(x,y) + dt * reactFunc(l)
+    next.set(x,y,v)
   }
+
+  def updateField() = for( i <- ( 0 until w*h ) ) set(i, next(i) )
 
   def multiplyKernel( x:Int, y:Int, l: List[Float] ) : Float = {
 
@@ -110,15 +119,15 @@ object Input extends KeyMouseListener {
       Main.field.sstep(.01f)
     }
     if( keyCode == KeyEvent.VK_M ){
-      //Main.field.go = !Main.field.go
+      Main.field.go = !Main.field.go
       
-      Main.win.capture match{ 
-        case v:MediaWriter => v.close(); Main.win.capture = null; Main.field.go = false;
-        case _ => Main.win.capture = new MediaWriter; Main.field.go = true;
-      }
+      /*Main.win.capture match{ 
+        case v:MediaWriter => v.close(); Main.win.capture = null;
+        case _ => Main.win.capture = new MediaWriter;
+      }*/
     }
     if( keyCode == KeyEvent.VK_R ){
-      Main.field.readImage( "input.png" )
+//      Main.field.readImage( "input.png" )
     }
     //if( keyCode == KeyEvent.VK_F ) Main.field.alpha += .05f
     //if( keyCode == KeyEvent.VK_V ) Main.field.alpha -= .05f

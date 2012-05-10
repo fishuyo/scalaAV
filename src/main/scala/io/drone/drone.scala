@@ -10,6 +10,7 @@ import de.sciss.osc._
 
 object Drone {
 
+  var ready = false
   var flying = false
   var drone : ARDrone = _
   //init()
@@ -23,7 +24,7 @@ object Drone {
       clearEmergency
       drone.waitForReady(5000)
       println("Drone connected and ready!")
-
+      ready = true
       trim
 
     } catch {
@@ -113,6 +114,7 @@ class DroneOSCControl( val port:Int) {
 
   //rcv.dump( Dump.Both )
   rcv.action = {
+    case(Message( "/drone/connect", _ @ _*), _) => Drone.init
     case(Message( "/drone/takeoff", _ @ _*), _) => println("TAKEOFF!"); Drone.takeOff
     case(Message( "/drone/land", _ @ _*), _) => println("LAND!"); Drone.land
     case(Message( "/drone/move", a:Float,b:Float,c:Float,d:Float ), _) => println("MOVE: " + a + " " + b + " " + c + " " + d); Drone.move(a,b,c,d)
