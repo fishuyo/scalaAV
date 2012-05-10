@@ -1,9 +1,7 @@
-<<<<<<< HEAD
 .DS_Store
 project/
 target/
 
-=======
 *.class
 *.log
 
@@ -17,4 +15,3 @@ project/plugins/project/
 
 # Scala-IDE specific
 .scala_dependencies
->>>>>>> 51055c4773a5333761d7779fa94825d689cdceb6
