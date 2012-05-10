@@ -1,0 +1,20 @@
+<<<<<<< HEAD
+.DS_Store
+project/
+target/
+
+=======
+*.class
+*.log
+
+# sbt specific
+dist/*
+target/
+lib_managed/
+src_managed/
+project/boot/
+project/plugins/project/
+
+# Scala-IDE specific
+.scala_dependencies
+>>>>>>> 51055c4773a5333761d7779fa94825d689cdceb6
