@@ -77,13 +77,13 @@ class WaveField extends Vec3Field2D {
       val lap =  -4.f*height(x,y) + height(x+1,y) + height(x-1,y) + height(x,y+1) + height(x,y-1)
       val tmp = height(x,y)
       val v = r2 * c * lap + 2.f*tmp - oldheight(x,y)
-      height.set(x,y,v)
+      next.set(x,y,v)
       oldheight.set(x,y,tmp)
 
       set(x,y,Vec3(v,v,v) )
     }
     
-    for( i <- ( 0 until w*h ) ){ chemA.set(i, chemA.next(i) ); chemB.set(i, chemB.next(i)) }
+    for( i <- ( 0 until w*h ) ) height.set(i, next(i)) //{ chemA.set(i, chemA.next(i) ); chemB.set(i, chemB.next(i)) }
   }
 }
 
@@ -102,10 +102,10 @@ object Input extends KeyMouseListener {
     if( keyCode == KeyEvent.VK_M ){
       Main.field.go = !Main.field.go
       
-      Main.win.capture match{ 
+      /*Main.win.capture match{ 
         case v:MediaWriter => v.close(); Main.win.capture = null;
         case _ => Main.win.capture = new MediaWriter;
-      }
+      }*/
     }
     if( keyCode == KeyEvent.VK_R ){
 //      Main.field.readImage( "input.png" )
