@@ -9,7 +9,9 @@ import javax.media.opengl._
 
 object Trees extends GLAnimatable {
 
-  var trees = List[TreeNode]( TreeNode(Vec3(0), .1f) )
+  var g = -10.f
+
+  var trees = TreeNode(Vec3(0), .1f) :: List()
   trees(0).branch( 6, 45.f, .8f, 0 )
   override def step( dt: Float ) = trees.foreach( _.step(dt) )
   override def onDraw( gl: GL2 ) = trees.foreach( _.onDraw(gl) )
@@ -55,7 +57,7 @@ class TreeNode extends GLAnimatable {
   override def step( dt: Float ) = {
 
     if( !pinned ){
-      accel += Vec3( 0, -10.f, 0 )
+      accel += Vec3( 0, Trees.g, 0 )
 
       //verlet integration
       val v = pos - lPos

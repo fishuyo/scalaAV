@@ -1,6 +1,6 @@
 
 package com.fishuyo
-package examples.reactdiffuse
+package examples.reactdiffusesuck
 
 import graphics._
 import maths._
@@ -26,10 +26,9 @@ object Main extends App {
 
 class ReactDiffuseField extends Vec3Field2D {
   
-
   val next = new Field2D
   type RA = List[Float]
-  val chemFields = new ChemField( .0002f, (l:RA) => -l(0)*l(1)*l(1) + .05f*(1-l(0)) ) :: new ChemField( .0001f, (l:RA) => l(0)*l(1)*l(1) - (.05f+.0675f)*l(1)) :: List()
+  val chemFields = new ChemField( .0002f, (l:RA) => -l(0)*l(1)*l(1) + .05f*(1.f-l(0)) ) :: new ChemField( .00001f, (l:RA) => l(0)*l(1)*l(1) - (.05f+.0675f)*l(1)) :: List()
   val dx = 2.f / Main.n
 
   override def allocate( w:Int, h:Int ) = {
@@ -42,14 +41,12 @@ class ReactDiffuseField extends Vec3Field2D {
     val s = 10;
     for( j <- (-s to s); i <- (-s to s) ) chemFields(1).set( w/2+i, h/2+j, 1.f )
 
-
-    for( y <- ( 0 to h-1 ); x <- ( 0 to w-1 )){
+    for( y <- ( 1 to h-2 ); x <- ( 1 to w-2 )) chemFields.foreach( _.diffuse(x,y,.1f) )
+    for( y <- ( 1 to h-2 ); x <- ( 1 to w-2 )){
       
-      chemFields.foreach( _.diffuse(x,y,.1f) )
+      //chemFields.foreach( _.diffuse(x,y,.1f) )
       chemFields.foreach( _.react( chemFields, x, y, .1f ) )
-      
       var v =chemFields.map(  f => f(x,y) )
-
       set(x,y,Vec3(0,v(0),v(1)) )
     }
     
@@ -90,7 +87,7 @@ class ChemField( var alpha:Float, val reactFunc: (List[Float])=>Float )  extends
     var v = 0.f
     var c = 0
     for( j<-(-s to s); i<-(-s to s)){
-      v += l(c) * getToroidal(x+i,y+j)
+      v += l(c) * this(x+i,y+j)
       c += 1
     }
     v

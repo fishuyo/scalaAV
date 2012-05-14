@@ -8,6 +8,8 @@ import media._
 
 import java.nio.FloatBuffer
 import javax.swing._
+import java.awt._
+import java.awt.event._
 import java.awt.image.BufferedImage
 
 import javax.media.opengl._
@@ -26,6 +28,9 @@ class GLRenderWindow extends GLEventListener{
   var w=600
   var h=600
   var fps=60
+  var fullscreen=false
+  var displayChanged=false
+  var dm_old:DisplayMode = null
 
   val profile = GLProfile.get(GLProfile.GL2);
   val capabilities = new GLCapabilities(profile);
@@ -38,17 +43,19 @@ class GLRenderWindow extends GLEventListener{
   glcanvas.addGLEventListener(this);
   glcanvas.setSize( w, h );
                                  
-  val frame = new JFrame( name );
+  var frame = new JFrame( name );
   frame.getContentPane().add( glcanvas);
   frame.setDefaultCloseOperation( JFrame.EXIT_ON_CLOSE )
   
   frame.setSize( frame.getContentPane().getPreferredSize() );
   frame.setVisible( true );
+  frame.requestFocus
 
   val animator = new FPSAnimator( glcanvas, fps )
   animator.start
   
   val glu = new GLU();
+
 
   def init(drawable: GLAutoDrawable) = { 
 
@@ -70,9 +77,8 @@ class GLRenderWindow extends GLEventListener{
 
     gl.setSwapInterval(1)
 
-    glcanvas.addKeyListener( input )
-    glcanvas.addMouseListener( input )
-    glcanvas.addMouseMotionListener( input )
+    addKeyMouseListener(input)
+    glcanvas.addKeyListener( new KeyMouseListener { override def keyPressed(e:KeyEvent) = { if(e.getKeyCode == KeyEvent.VK_ESCAPE) toggleFullscreen }} )
 
   }
 
@@ -128,4 +134,57 @@ class GLRenderWindow extends GLEventListener{
     glcanvas.addMouseListener(l)
     glcanvas.addMouseMotionListener(l)
   }
+
+  def toggleFullscreen() = {
+    val ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
+    val gd = ge.getDefaultScreenDevice();
+    
+    if(!fullscreen){
+      dm_old = gd.getDisplayMode();
+      var dm = dm_old;
+      
+      frame = new JFrame( name );
+      frame.getContentPane().add( glcanvas);
+      frame.setDefaultCloseOperation( JFrame.EXIT_ON_CLOSE )
+      frame.setVisible( false )
+      frame.setUndecorated( true );
+      frame.setVisible( true );
+      frame.requestFocus
+      
+      if( gd.isFullScreenSupported() ){
+        println("Fullscreen...");//ddd
+        try {
+          gd.setFullScreenWindow( frame );
+          fullscreen = true; 
+        } catch {
+          case e:Exception =>
+          gd.setFullScreenWindow( null );
+          fullscreen = false; 
+        }
+        // Once an application is in full-screen exclusive mode, 
+        // it may be able to take advantage of actively setting the display mode.
+        if( fullscreen && gd.isDisplayChangeSupported() ) {
+          // Change displaymode here [..]
+          try {
+            gd.setDisplayMode( dm );
+            displayChanged = true;
+          } catch {
+            case e:Exception =>
+            gd.setDisplayMode( dm_old );
+            displayChanged = false;
+          }
+        }
+      }
+    } else {
+      if( gd.isFullScreenSupported() ){
+        gd.setFullScreenWindow(null);
+        println("Exit fullscreen done.");//ddd
+        //if( displayChanged ) gd.setDisplayMode( dm_old ); 
+        fullscreen = false; 
+      } 
+    
+    }
+  }
 }
+
+

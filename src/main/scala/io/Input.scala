@@ -21,7 +21,7 @@ object NavInput extends KeyMouseListener {
 		val keyCode = e.getKeyCode();
 
 		if (keyCode == KeyEvent.VK_ESCAPE) {
-			System.exit(0);
+			//System.exit(0);
 		}
 		if (keyCode == KeyEvent.VK_W) {
 			Camera.forward
@@ -48,7 +48,7 @@ object NavInput extends KeyMouseListener {
       moving += 1
     }
 		if (keyCode == KeyEvent.VK_Q) {
-			//this.rotation = !rotation;
+			System.exit(0)//this.rotation = !rotation;
 		}
     if (keyCode == KeyEvent.VK_BACK_QUOTE) Camera.initialPosition()
 

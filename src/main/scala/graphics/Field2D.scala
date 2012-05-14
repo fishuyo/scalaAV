@@ -32,6 +32,7 @@ class Field2D extends GLAnimatable {
   def allocate( x:Int, y:Int ) = { w=x; h=y; data = Buffers.newDirectFloatBuffer( w*h ); }
   def set( i:Int, v:Float ) = data.put( i, v )
   def set( x:Int, y:Int, v:Float) = data.put( w*y + x, v)
+  def set( v:Float ) = for( i <- ( 0 until w*h )) data.put( i, v )
   def set( a: Array[Float] ) = {
     //should check array size matches field size
     data.put( a )

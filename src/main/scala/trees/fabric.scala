@@ -10,9 +10,10 @@ import scala.collection.mutable.ListBuffer
 
 object Fabric extends GLAnimatable {
 
+  var g = -10.f
   var fabrics = List[Fabric]( new Fabric )
 
-  def apply( p: Vec3, w: Float, h: Float, d: Float) = new Fabric { pos=p; width=w; height=h; dist=d }
+  def apply( p: Vec3, w: Float, h: Float, d: Float) = new Fabric(p,w,h,d)
 
   override def step( dt: Float ) = fabrics.foreach( _.step(dt) )
   override def onDraw( gl: GL2 ) = fabrics.foreach( _.onDraw(gl) )
@@ -20,12 +21,8 @@ object Fabric extends GLAnimatable {
 
 }
 
-class Fabric extends GLAnimatable {
+class Fabric( var pos:Vec3=Vec3(0), var width:Float=1.f, var height:Float=1.f, var dist:Float=.05f) extends GLAnimatable {
 
-  var pos = Vec3(0)
-  var width = 1.f
-  var height = 1.f
-  var dist = .05f
   var stiff = 1.f
   var particles = ListBuffer[VParticle]()
 
@@ -95,7 +92,7 @@ class VParticle {
   def step( dt: Float ) = {
 
     if( !pinned ){
-      accel += Vec3( 0, -5.f, 0 )
+      accel += Vec3( 0, Fabric.g, 0 )
 
       //verlet integration
       val v = pos - lPos
