@@ -6,6 +6,8 @@ import graphics._
 import maths._
 import ray._
 
+import io.drone._
+
 import de.sciss.osc._
 import com.codeminders.ardrone._
 
@@ -20,7 +22,7 @@ object Main extends App {
   """ )
 
   val cfg         = UDP.Config()
-  cfg.localPort   = 10001  // 0x53 0x4F or 'SO'
+  cfg.localPort   = 10000  // 0x53 0x4F or 'SO'
   val rcv         = UDP.Receiver( cfg )
   val sync = new AnyRef
 
@@ -49,35 +51,3 @@ object Main extends App {
 
 }
 
-
-object Drone {
-
-  var flying = false
-  val drone = new ARDrone
-  
-  try {
-    connect
-    clearEmergency
-    drone.waitForReady(5000)
-    println("Drone connected and ready...")
-    
-    trim
-
-  } catch {
-    case e: Throwable => e.printStackTrace
-  }
-
-  def connect() = drone.connect
-  def disconnect() = drone.disconnect
-  def clearEmergency() = drone.clearEmergencySignal
-  def trim() = drone.trim
-  def takeOff() = drone.takeOff
-  def land() = drone.land
-
-  def toggleFly = {
-    if( flying ) drone.land
-    else drone.takeOff
-    flying = !flying
-  }
-
-}

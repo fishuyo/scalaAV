@@ -3,8 +3,11 @@ package com.fishuyo
 package io
 package drone
 
+import maths._
+
 import com.codeminders.ardrone._
 
+import java.net._
 import java.awt.event._
 import de.sciss.osc._
 
@@ -13,11 +16,15 @@ object Drone {
   var ready = false
   var flying = false
   var drone : ARDrone = _
+  var ip = "192.168.1.1"
+  var pos = Vec3(0)
+  var dest = Vec3(0)
+  var yaw = 0.f
   //init()
 
-  def init() = {
+  def init( ) = {
     try {
-      drone = new ARDrone
+      drone = new ARDrone( InetAddress.getByName(ip) )
       println("Connecting...")
       connect
       println("Drone Connected.")
@@ -118,6 +125,7 @@ class DroneOSCControl( val port:Int) {
     case(Message( "/drone/takeoff", _ @ _*), _) => println("TAKEOFF!"); Drone.takeOff
     case(Message( "/drone/land", _ @ _*), _) => println("LAND!"); Drone.land
     case(Message( "/drone/move", a:Float,b:Float,c:Float,d:Float ), _) => println("MOVE: " + a + " " + b + " " + c + " " + d); Drone.move(a,b,c,d)
+    case(Message( "/drone/moveto", x:Float,y:Float,z:Float ), _) => println("MOVE_TO: "+x+" "+y+" "+z);Drone.dest = Vec3(x,y,z)
     case(Message( "/drone/hover", _ @ _*), _) => println("HOVEr!"); Drone.hover
     case(Message( name, f @ _*), _) => null
 
