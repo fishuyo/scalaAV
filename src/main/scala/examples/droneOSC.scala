@@ -58,7 +58,7 @@ class TransTrack {
   rcv.action = {
    
     case (Message( name, x:Float,y:Float,z:Float,w:Float, _ @ _* ), _) =>
-      if( Drone.drone != null ){
+      if( Drone.ready ){
         if( name.startsWith("/tracker2")){
           println(x + " " + y + " " + z)
           if( y > .2f) Drone.takeOff

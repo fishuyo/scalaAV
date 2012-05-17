@@ -71,8 +71,8 @@ object Drone {
 
     val dw = destYaw - yaw
     if( math.abs(dw) > 5.f ){
-      var r = .3f
-      if( dw < 0.f) r = -.3f
+      var r = .7f
+      if( dw < 0.f) r = -.7f
       Drone.move(0,0,0,r)
     }
     println( "diff in yaw: " + dw )
