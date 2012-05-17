@@ -154,6 +154,23 @@ class Vec3Field2D extends GLAnimatable {
     }  
   }
 
+  def readImage( file: String ) = {
+
+    val image = javax.imageio.ImageIO.read( new java.io.File( file ) )
+    var h = image.getHeight()
+    var w = image.getWidth()
+    var n = h
+    if( w > h ) n = w
+    
+    allocate(n,n)
+    
+    for( j <- (0 until h); i <- (0 until w)){
+      var v = (new java.awt.Color( image.getRGB(i,j) )).getColorComponents(null)
+      if( v.length > 1 ) set(i,h-1-j, Vec3(v(0),v(1),v(2)) ) // TODO real grayscale conversion
+      else set(i,h-1-j,Vec3(v(0)) )
+    }
+  }
+
   override def onDraw( gl: GL2 ) = {
     import GL._; import gl._
     

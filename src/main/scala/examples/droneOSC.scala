@@ -65,7 +65,14 @@ class TransTrack {
           if( y < -.55f) Drone.land
         }else if( name.startsWith("/tracker1")){
           Drone.pos = Vec3(x,y,z)
-          Drone.yaw = w
+          Drone.yaw = w; while ( Drone.yaw < 0.f ) Drone.yaw += 360.f
+          val dw = Drone.destYaw - Drone.yaw
+          if( math.abs(dw) > 10.f ){
+            var r = .1f
+            if( dw < 0.f ) r = -.1f
+            Drone.move(0,0,0,r) 
+          }
+
           val dp = (Drone.dest - Drone.pos).magSq
           if( dp  > 3.f ){
             val cos = math.cos(w*d2r)
@@ -74,7 +81,7 @@ class TransTrack {
             val ud = d.y
             val fb = d.x*cos - d.z*sin
             val lr = -d.x*sin - d.z*cos
-            Drone.move(lr.toFloat,fb.toFloat,ud,0)
+            //Drone.move(lr.toFloat,fb.toFloat,ud,0)
           } 
           println( dp )
         }
