@@ -62,30 +62,33 @@ object Drone {
   def moveTo( x:Float,y:Float,z:Float,w:Float ) = {
     dest = Vec3(x,y,z)
     destYaw = w
-    while( destYaw < 0.f ) destYaw += 360.f
-    while( destYaw > 360.f ) destYaw -= 360.f
+    while( destYaw < -180.f ) destYaw += 360.f
+    while( destYaw > 180.f ) destYaw -= 360.f
   }
   def step(p:Vec3,w:Float ) = {
     pos = p;
-    yaw = w; while( yaw < 0.f ) yaw += 360.f; while( yaw > 360.f) yaw -= 360.f
+    yaw = w; while( yaw < -180.f ) yaw += 360.f; while( yaw > 180.f) yaw -= 360.f
 
-    val dw = destYaw - yaw
-    if( math.abs(dw) > 5.f ){
-      var r = .7f
-      if( dw < 0.f) r = -.7f
+    var dw = destYaw - yaw
+    if( dw > 180.f ) dw -= 360.f 
+    if( dw < -180.f ) dw += 360.f 
+    if( math.abs(dw) > 20.f ){
+      var r = .3f
+      if( dw < 0.f) r = -.3f
       Drone.move(0,0,0,r)
     }
-    println( "diff in yaw: " + dw )
+    //println( "diff in yaw: " + dw )
 
-    val dp = (Drone.dest - Drone.pos).magSq
-    if( dp  > 3.f ){
+    val dp = (Drone.dest - Drone.pos).mag
       val cos = math.cos(w*d2r)
       val sin = math.sin(w*d2r)
       val d = (Drone.dest - Drone.pos).normalize
-      val ud = d.y
-      val fb = d.x*cos - d.z*sin
-      val lr = -d.x*sin - d.z*cos
-      //Drone.move(lr.toFloat,fb.toFloat,ud,0)
+      val ud = if( d.y > 0.f ) .1f else -.1f
+      val fb = if( d.x*cos - d.z*sin > 0.f) .1f else -.1f
+      val lr = if( -d.x*sin - d.z*cos > 0.f) .1f else -.1f
+      println("dp: " + dp + "  "+lr+" "+fb+" "+ud)
+    if( dp  > .4f ){
+      Drone.move(lr.toFloat,fb.toFloat,ud,0)
     }
     //println( dp )
   }
