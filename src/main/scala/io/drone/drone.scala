@@ -13,6 +13,8 @@ import de.sciss.osc._
 
 object Drone {
 
+  val d2r = math.Pi / 180.f
+
   var ready = false
   var flying = false
   var drone : ARDrone = _
@@ -57,6 +59,37 @@ object Drone {
   }
 
   def move( lr: Float, fb: Float, ud: Float, r: Float ) = drone.move(lr,fb,ud,r)
+  def moveTo( x:Float,y:Float,z:Float,w:Float ) = {
+    dest = Vec3(x,y,z)
+    destYaw = w
+    while( destYaw < 0.f ) destYaw += 360.f
+    while( destYaw > 360.f ) destYaw -= 360.f
+  }
+  def step(p:Vec3,w:Float ) = {
+    pos = p;
+    yaw = w; while( yaw < 0.f ) yaw += 360.f; while( yaw > 360.f) yaw -= 360.f
+
+    val dw = destYaw - yaw
+    if( math.abs(dw) > 5.f ){
+      var r = .3f
+      if( dw < 0.f) r = -.3f
+      Drone.move(0,0,0,r)
+    }
+    println( "diff in yaw: " + dw )
+
+    val dp = (Drone.dest - Drone.pos).magSq
+    if( dp  > 3.f ){
+      val cos = math.cos(w*d2r)
+      val sin = math.sin(w*d2r)
+      val d = (Drone.dest - Drone.pos).normalize
+      val ud = d.y
+      val fb = d.x*cos - d.z*sin
+      val lr = -d.x*sin - d.z*cos
+      //Drone.move(lr.toFloat,fb.toFloat,ud,0)
+    }
+    //println( dp )
+  }
+
   def hover = drone.hover
 
 }
@@ -126,7 +159,7 @@ class DroneOSCControl( val port:Int) {
     case(Message( "/drone/takeoff", _ @ _*), _) => println("TAKEOFF!"); Drone.takeOff
     case(Message( "/drone/land", _ @ _*), _) => println("LAND!"); Drone.land
     case(Message( "/drone/move", a:Float,b:Float,c:Float,d:Float ), _) => println("MOVE: " + a + " " + b + " " + c + " " + d); Drone.move(a,b,c,d)
-    case(Message( "/drone/moveto", x:Float,y:Float,z:Float,w:Float ), _) => println("MOVE_TO: "+x+" "+y+" "+z);Drone.dest = Vec3(x,y,z); Drone.destYaw = w; while( Drone.destYaw < 0.f ) Drone.destYaw += 360.f
+    case(Message( "/drone/moveto", x:Float,y:Float,z:Float,w:Float ), _) => println("MOVE_TO: "+x+" "+y+" "+z+" "+w);Drone.moveTo(x,y,z,w)
     case(Message( "/drone/hover", _ @ _*), _) => println("HOVEr!"); Drone.hover
     case(Message( name, f @ _*), _) => null
 
