@@ -1,12 +1,37 @@
 
 package com.fishuyo
+package examples.dla3d
+
 import maths._
 import graphics._
+import io._
 
+import java.awt.event._
 import javax.media.opengl._
 import javax.media.opengl.fixedfunc.{GLLightingFunc => L}
 
 import scala.collection.mutable.ListBuffer
+
+object Main extends App {
+
+  GLScene.push( ParticleCollector )
+
+  val win = new GLRenderWindow
+  win.addKeyMouseListener( Input )
+
+}
+
+object Input extends KeyMouseListener {
+  override def keyPressed(e:KeyEvent) = {
+    val k=e.getKeyCode
+    k match {
+      case KeyEvent.VK_R => ParticleCollector.rotate = !ParticleCollector.rotate
+      case KeyEvent.VK_F => ParticleCollector.thresh += .01f
+      case KeyEvent.VK_V => ParticleCollector.thresh -= .01f
+      case _ => null
+    }
+  }
+}
 
 class Particle( var pos :Vec3, var vel:Vec3 ){
 
@@ -30,9 +55,11 @@ object Particle {
   def randomVec(s: Float) : Vec3 = new Vec3( rand.nextFloat * s - s/2, rand.nextFloat * s - s/2, rand.nextFloat * s - s/2)
 }
 
-object ParticleCollector {
+object ParticleCollector extends GLAnimatable {
 
   var thresh = .01f;
+  var rot = 0.f
+  var rotate = false;
 
   var particles = generateParticles(6000)
   var collection = List[Particle]( new Particle( Vec3(0), Vec3(0)) )
@@ -46,7 +73,10 @@ object ParticleCollector {
 }
 
 
-  def step( dt: Float )= {
+  override def step( dt: Float )= {
+
+    if( rotate ) rot += 4.f
+    if( rot > 180.f) rot = -180.f
 
     particles.foreach( ( p : Particle) => {
 
@@ -69,10 +99,12 @@ object ParticleCollector {
 
   }
 
-  def onDraw( gl: GL2 ) = {
+  override def onDraw( gl: GL2 ) = {
 
     gl.glDisable(L.GL_LIGHTING)
     gl.glEnable(GL3.GL_PROGRAM_POINT_SIZE)
+
+    gl.glRotatef(rot,0.f,1.f,0.f)
 
     gl.glPointSize( 2.0f )
     gl.glColor3f( 0.f, 1.f, 0.f)

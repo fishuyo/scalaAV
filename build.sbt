@@ -16,7 +16,7 @@ libraryDependencies ++= Seq(
   "org.scala-lang" % "scala-swing" % "2.9.1",
   "com.nativelibs4java" % "scalacl" % "0.2",
   "xuggle" % "xuggle-xuggler" % "5.4",
-  //"org.scalala" %% "scalala" % "1.0.0.RC3-SNAPSHOT"
+  "org.scalala" % "scalala_2.9.0" % "1.0.0.RC2-SNAPSHOT",
   "log4j" % "log4j" % "1.2.16",
   "net.sf.bluecove" % "bluecove" % "2.1.0",
   "net.sf.bluecove" % "bluecove-gpl" % "2.1.0"
