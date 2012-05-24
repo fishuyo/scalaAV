@@ -66,12 +66,8 @@ object Input extends KeyListener with MouseListener with MouseMotionListener {
     if( keyCode == KeyEvent.VK_G) Main.field.c += Vec3( 0,.1f,0)
     println( Main.field.c )
     if( keyCode == KeyEvent.VK_M ){
-      //Main.field.go = !Main.field.go
-      
-      Main.win.capture match{ 
-        case v:MediaWriter => v.close(); Main.win.capture = null; Main.field.go = false;
-        case _ => Main.win.capture = new MediaWriter; Main.field.go = true;
-      }
+      Main.field.go = !Main.field.go
+      Main.win.toggleCapture
     }
   }
   def keyReleased( e: KeyEvent ) = {}

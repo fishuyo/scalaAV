@@ -4,6 +4,7 @@ package examples.dla3d
 
 import maths._
 import graphics._
+import ray._
 import io._
 
 import java.awt.event._
@@ -16,6 +17,9 @@ object Main extends App {
 
   GLScene.push( ParticleCollector )
 
+  ParticleCollector.seedLine( Vec3(0,-1,0), Vec3(0,1,0) )
+  //ParticleCollector.collection = new Particle :: List()
+
   val win = new GLRenderWindow
   win.addKeyMouseListener( Input )
 
@@ -27,18 +31,22 @@ object Input extends KeyMouseListener {
     k match {
       case KeyEvent.VK_R => ParticleCollector.rotate = !ParticleCollector.rotate
       case KeyEvent.VK_F => ParticleCollector.thresh += .01f
-      case KeyEvent.VK_V => ParticleCollector.thresh -= .01f
+      case KeyEvent.VK_V => ParticleCollector.thresh -= .01f 
+      case KeyEvent.VK_O => ParticleCollector.writeOrientedPoints("points.xyz")
+      case KeyEvent.VK_P => ParticleCollector.writePoints2D("points2Dspun.xyz")
+      case KeyEvent.VK_M => Main.win.toggleCapture
       case _ => null
     }
   }
 }
 
-class Particle( var pos :Vec3, var vel:Vec3 ){
+class Particle( var pos :Vec3=Vec3(0), var vel:Vec3=Vec3(0) ){
 
   var c: RGB = RGB.green
   
   def step( dt: Float ) = {
-    pos += vel * dt 
+    //pos += Particle.randomVec(.01f) //random walk
+    pos += vel * dt //linear motion
   }
 
   def onDraw( gl: GL2 ) = {
@@ -62,7 +70,7 @@ object ParticleCollector extends GLAnimatable {
   var rotate = false;
 
   var particles = generateParticles(6000)
-  var collection = List[Particle]( new Particle( Vec3(0), Vec3(0)) )
+  var collection = List[Particle]()
 
   def generateParticles( n: Int): ListBuffer[Particle] = {
     val p = Particle()
@@ -70,7 +78,19 @@ object ParticleCollector extends GLAnimatable {
       case 0 => val l = new ListBuffer[Particle](); l += p
       case _ => generateParticles(n-1) += p
     }
-}
+  }
+
+  def seedLine( from:Vec3, to:Vec3, d:Float = .01f ) = {
+
+    val dir = to - from
+    var dist = dir.mag
+    val r = new Ray( from, dir.normalize )
+    while( dist >= 0.f ){
+      collection = new Particle(r(dist)) :: collection
+      dist -= d
+    }
+
+  }
 
 
   override def step( dt: Float )= {

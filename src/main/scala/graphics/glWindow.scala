@@ -135,6 +135,14 @@ class GLRenderWindow extends GLEventListener{
     glcanvas.addMouseMotionListener(l)
   }
 
+  def toggleCapture() = {
+    if( capture == null ) capture = new MediaWriter
+    else{
+      capture.close
+      capture = null
+    }
+  }
+
   def toggleFullscreen() = {
     val ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
     val gd = ge.getDefaultScreenDevice();
