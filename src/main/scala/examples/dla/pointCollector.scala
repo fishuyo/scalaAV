@@ -123,14 +123,16 @@ object ParticleCollector extends GLAnimatable {
 
     gl.glDisable(L.GL_LIGHTING)
     gl.glEnable(GL3.GL_PROGRAM_POINT_SIZE)
+    gl.glEnable (GL.GL_BLEND);
+    gl.glBlendFunc (GL.GL_SRC_ALPHA, GL.GL_ONE_MINUS_SRC_ALPHA);
 
     gl.glRotatef(rot,0.f,1.f,0.f)
 
-    gl.glPointSize( 2.0f )
-    gl.glColor3f( 0.f, 1.f, 0.f)
+    gl.glPointSize( 5.0f )
+    gl.glColor4f( 0.f, 1.f, 0.f, .2f)
     gl.glBegin( GL.GL_POINTS )
       particles.foreach( _.onDraw( gl ) )
-      gl.glColor3f( 0.f, 0.f, 1.f)
+      gl.glColor4f( 0.f, 0.f, 1.f, .2f)
       collection.foreach( _.onDraw( gl ) )
     gl.glEnd
     
