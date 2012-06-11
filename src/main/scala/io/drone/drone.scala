@@ -20,6 +20,7 @@ object Drone {
   var drone : ARDrone = _
   var ip = "192.168.1.1"
   var pos = Vec3(0)
+  var vel = Vec3(0)
   var dest = Vec3(0)
   var yaw = 0.f
   var destYaw = 0.f
@@ -34,8 +35,8 @@ object Drone {
       clearEmergency
       drone.waitForReady(5000)
       println("Drone connected and ready!")
-      ready = true
       trim
+      ready = true
 
     } catch {
       case e: Throwable => e.printStackTrace
@@ -46,8 +47,8 @@ object Drone {
   def disconnect() = drone.disconnect
   def clearEmergency() = drone.clearEmergencySignal
   def trim() = drone.trim
-  def takeOff() = drone.takeOff
-  def land() = drone.land
+  def takeOff() = { drone.takeOff; flying = true;}
+  def land() = {drone.land; flying = false;}
 
   def playLed = drone.playLED(1, 10, 5 )
 
@@ -66,6 +67,10 @@ object Drone {
     while( destYaw > 180.f ) destYaw -= 360.f
   }
   def step(p:Vec3,w:Float ):Any = {
+
+    if( !flying ) return null
+    vel = p - pos
+
     pos = p;
     yaw = w; while( yaw < -180.f ) yaw += 360.f; while( yaw > 180.f) yaw -= 360.f
 
@@ -80,17 +85,18 @@ object Drone {
     }
     //println( "diff in yaw: " + dw )
 
-    val dp = (Drone.dest - Drone.pos).mag
+    val dir = (dest - (pos+vel))
+    val dp = dir.mag
     val cos = math.cos(w*d2r)
     val sin = math.sin(w*d2r)
-    val d = (Drone.dest - Drone.pos).normalize
-    val ud = if( d.y > 0.f ) .1f else -.1f
-    var fb = d.x*cos - d.z*sin
-    var lr = -d.x*sin - d.z*cos
-    fb = fb * .1
-    lr = lr * .1
-    println("dp: " + dp + "  "+lr+" "+fb+" "+ud)
-    if( dp  > .4f ){
+    val d = (dest - pos).normalize
+    var ud = d.y * .1f
+    var fb = -d.x*cos - d.z*sin  //d.x*cos - d.z*sin
+    var lr = -d.x*sin + d.z*cos  //-d.x*sin - d.z*cos
+    fb = fb * .1f
+    lr = lr * .1f
+    //println("dp: " + dp + "  "+lr+" "+fb+" "+ud)
+    if( dp  > .33f ){
       Drone.move(lr.toFloat,fb.toFloat,ud,0)
     }else {
       Drone.hover
@@ -124,8 +130,8 @@ object DroneKeyboardControl extends KeyMouseListener {
     if( keyCode == KeyEvent.VK_P ) Drone.init
     if( keyCode == KeyEvent.VK_F) lr += -.5f
     if( keyCode == KeyEvent.VK_H) lr += .5f
-    if( keyCode == KeyEvent.VK_T) fb += .5f
-    if( keyCode == KeyEvent.VK_G) fb += -.5f
+    if( keyCode == KeyEvent.VK_T) fb += -.5f
+    if( keyCode == KeyEvent.VK_G) fb += .5f
 
     if( keyCode == KeyEvent.VK_J) rot += -.5f
     if( keyCode == KeyEvent.VK_L) rot += .5f
@@ -165,10 +171,12 @@ class DroneOSCControl( val port:Int) {
   //rcv.dump( Dump.Both )
   rcv.action = {
     case(Message( "/drone/connect", _ @ _*), _) => Drone.init
+    case(Message( "/drone/disconnect", _ @ _*), _) => Drone.disconnect
     case(Message( "/drone/takeoff", _ @ _*), _) => println("TAKEOFF!"); Drone.takeOff
     case(Message( "/drone/land", _ @ _*), _) => println("LAND!"); Drone.land
     case(Message( "/drone/move", a:Float,b:Float,c:Float,d:Float ), _) => println("MOVE: " + a + " " + b + " " + c + " " + d); Drone.move(a,b,c,d)
-    case(Message( "/drone/moveto", x:Float,y:Float,z:Float,w:Float ), _) => println("MOVE_TO: "+x+" "+y+" "+z+" "+w);Drone.moveTo(x,y,z,w)
+    case(Message( "/drone/moveto", x:Float,y:Float,z:Float,w:Float ), _) => Drone.moveTo(x,y,z,w); //println("MOVE_TO: "+x+" "+y+" "+z+" "+w)
+    case(Message( "/drone/setposh", x:Float,y:Float,z:Float,w:Float ), _) => Drone.step(Vec3(x,y,z),w); //println("pos: "+x+" "+y+" "+z+" "+w)
     case(Message( "/drone/hover", _ @ _*), _) => println("HOVEr!"); Drone.hover
     case(Message( name, f @ _*), _) => null
 

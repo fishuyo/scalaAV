@@ -24,7 +24,7 @@ object Main extends App {
   Drone.ip = "192.168.3.1"
   val osc = new DroneOSCControl( 10001 )
 
-  val track = new TransTrack
+  //val track = new TransTrack
   
   val frame = new JFrame("droneOSC")
   frame.setDefaultCloseOperation( JFrame.EXIT_ON_CLOSE )
@@ -52,21 +52,36 @@ class TransTrack {
   val rcv         = UDP.Receiver( cfg )
   val sync = new AnyRef
   
+  var flying = false; 
+  
   println( "TransTrack listening on UDP " + cfg.localPort )
 
   //rcv.dump( Dump.Both )
   rcv.action = {
-   
-    case (Message( name, x:Float,y:Float,z:Float,w:Float, _ @ _* ), _) =>
+  
+    case (Message( name, x:Float,y:Float,z:Float ), _) =>
       if( Drone.ready ){
         if( name.startsWith("/tracker2")){
-          println(x + " " + y + " " + z)
-          if( y > .2f) Drone.takeOff
-          if( y < -.55f) Drone.land
-        }else if( name.startsWith("/tracker1")){
-          Drone.step( Vec3(x,y,z), w )
+          //println(x + " " + y + " " + z)
+          if( y > .2f && !flying ){
+             println("TAKEOFF!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
+             Drone.takeOff
+             flying = true
+          }
+          if( y < -.55f && flying ){
+             Drone.land
+             flying = false
+          }
         }
       }
+
+    /*case (Message( name, x:Float,y:Float,z:Float,w:Float ), _) =>
+      if( Drone.ready ){      
+        if( name.startsWith("/tracker1")){
+          //println(".")
+          Drone.step( Vec3(x,y,z), w )
+        }
+      }*/
 
     case (Message( name, v @ _* ), _) =>
       println( "Received message '" + name + "'" )
