@@ -13,6 +13,7 @@ resolvers ++= Seq(
 )
 
 libraryDependencies ++= Seq(
+  "org.scala-lang" % "scala-compiler" % "2.9.1",
   "org.scala-lang" % "scala-swing" % "2.9.1",
   "com.nativelibs4java" % "scalacl" % "0.2",
   "xuggle" % "xuggle-xuggler" % "5.4",

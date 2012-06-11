@@ -1,6 +1,6 @@
 
 package com.fishuyo
-package examples.mat200c
+package examples.field3d
 
 import graphics._
 import maths._
@@ -25,7 +25,7 @@ object Mouse extends MouseListener with MouseMotionListener {
     val xx = ((r(200.f).x + 1.f) * 32).toInt  
     val yy = ((r(200.f).y + 1.f) * 32).toInt 
     println( xx + " " + yy )
-    if( xx >= 0 && xx <= 63 && yy >= 0 && yy <= 63 ) Main.field.set( xx,yy, 1.f )
+    //if( xx >= 0 && xx <= 63 && yy >= 0 && yy <= 63 ) Main.field.set( xx,yy, 1.f )
   }
 
   def mouseClicked( e: MouseEvent) = {}
@@ -39,11 +39,11 @@ object Mouse extends MouseListener with MouseMotionListener {
 
 object Main extends App {
 
-  val n = 64;
-  val field = Field2D( n, n )
-  field.data.put( Array(1.0f, 0.f,0.f,0.f,0.f,1.f,0.f,0.f,0.f,0.f,1.f,0.f,0.f,0.f,0.f,1.f ));
-  field.data.rewind();
-  println( field.data.capacity );
+  val n = 10;
+  val field = new VecField3D( n )
+  for( z<-(0 until n); y<-(0 until n); x<-(0 until n)){
+    field.set(x,y,z, field.centerOfBin(x,y,z).normalize * -.1f)
+  }
 
   GLScene.push( field );
 

@@ -26,6 +26,7 @@ object Main extends App {
 
 class VelocityField extends Vec3Field2D {
 
+  var c = 0.f;
 
   override def allocate( w:Int, h:Int ) = {
     super.allocate(w,h)
