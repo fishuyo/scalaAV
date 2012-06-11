@@ -13,6 +13,7 @@ object Vec3 {
 }
 
 class Vec3( var x: Float, var y: Float, var z: Float ){
+  def set(v:Vec3) = { x=v.x; y=v.y; z=v.z }
   def +(v: Vec3) = Vec3( x+v.x, y+v.y, z+v.z )
   def +=(v: Vec3) = { x+=v.x; y+=v.y; z+=v.z }
   def -(v: Vec3) = Vec3( x-v.x, y-v.y, z-v.z )
@@ -33,6 +34,9 @@ class Vec3( var x: Float, var y: Float, var z: Float ){
 
   def zero() = {x=0;y=0;z=0}
   override def toString() = "[" + x + " " + y + " " + z + "]"
+
+  def lerp( v:Vec3, d: Float ) = this + (v-this)*d
+  
 }
 
 
