@@ -8,7 +8,9 @@ import javax.media.opengl._
 /**
 * Camera
 */
-object Camera {
+object Camera extends Camera
+
+class Camera {
 
   val rad = scala.math.Pi / 180.f 
   

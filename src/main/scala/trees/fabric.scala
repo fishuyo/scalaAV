@@ -13,7 +13,7 @@ object Fabric extends GLAnimatable {
   var g = -10.f
   var fabrics = List[Fabric]( new Fabric )
 
-  def apply( p: Vec3, w: Float, h: Float, d: Float) = new Fabric(p,w,h,d)
+  def apply( p: Vec3, w: Float, h: Float, d: Float, m:Int = 0) = new Fabric(p,w,h,d,m)
 
   override def step( dt: Float ) = fabrics.foreach( _.step(dt) )
   override def onDraw( gl: GL2 ) = fabrics.foreach( _.onDraw(gl) )
@@ -21,7 +21,7 @@ object Fabric extends GLAnimatable {
 
 }
 
-class Fabric( var pos:Vec3=Vec3(0), var width:Float=1.f, var height:Float=1.f, var dist:Float=.05f) extends GLAnimatable {
+class Fabric( var pos:Vec3=Vec3(0), var width:Float=1.f, var height:Float=1.f, var dist:Float=.05f, mode:Int=0) extends GLAnimatable {
 
   var stiff = 1.f
   var particles = ListBuffer[VParticle]()
@@ -29,13 +29,20 @@ class Fabric( var pos:Vec3=Vec3(0), var width:Float=1.f, var height:Float=1.f, v
   val nx = (width / dist).toInt
   val ny = (height / dist).toInt
   for( j <- ( 0 until ny ); i <- ( 0 until nx)){
-    
-    val p = VParticle( Vec3( pos.x - width/2 + i * dist, pos.y, pos.z + height/2 - j * dist), dist)
+
+    var x=0.f; var y=0.f; var p:VParticle = null
+
+    mode match {
+      case 0 => x = pos.x - width/2 + i*dist; y = pos.y + height/2 - j*dist; p = VParticle( Vec3(x,y,pos.z), dist )
+      case 1 => x = pos.z - width/2 + i*dist; y = pos.y + height/2 - j*dist; p = VParticle( Vec3(pos.x,y,x), dist )
+      case 2 => x = pos.x - width/2 + i*dist; y = pos.z + height/2 - j*dist; p = VParticle( Vec3(x,pos.y,y), dist )
+      case _ => x = pos.x - width/2 + i*dist; y = pos.y + height/2 - j*dist; p = VParticle( Vec3(x,y,pos.z), dist )
+    }
 
     if( i != 0 ) p.linkTo( particles(particles.length-1) )
     if( j != 0 ) p.linkTo( particles( (j-1) * nx + i) )
-    if( j > ny/2 - 5 && j < ny/2 + 5 && i < nx/2 +5 && i>nx/2-5) p.pinTo( p.pos )
-
+    if( mode == 2 && j > ny/2 - 5 && j < ny/2 + 5 && i < nx/2 +5 && i>nx/2-5) p.pinTo( p.pos )
+    else if( j == 0 ) p.pinTo( p.pos )
     particles += p
   }
   

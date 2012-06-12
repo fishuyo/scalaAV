@@ -12,7 +12,9 @@ import java.awt.event.MouseEvent
 import java.awt.event.MouseListener
 import java.awt.event.MouseMotionListener
 
-object NavInput extends KeyMouseListener {
+object NavInput extends NavInput(Camera)
+
+class NavInput( var cam:Camera=Camera ) extends KeyMouseListener {
 
   var moving = 0
   var looking = 0
@@ -24,38 +26,38 @@ object NavInput extends KeyMouseListener {
 			//System.exit(0);
 		}
 		if (keyCode == KeyEvent.VK_W) {
-			Camera.forward
+			cam.forward
       moving += 1
 		}
 		if (keyCode == KeyEvent.VK_S) {
-			Camera.backward
+			cam.backward
       moving += 1
 		}
 		if (keyCode == KeyEvent.VK_A) {
-			Camera.left
+			cam.left
       moving += 1
 		}
 		if (keyCode == KeyEvent.VK_D) {
-		  Camera.right
+		  cam.right
       moving += 1
     }
 		if (keyCode == KeyEvent.VK_SPACE) {
-			Camera.up
+			cam.up
       moving += 1
 		}
 		if (keyCode == KeyEvent.VK_SHIFT) {
-      Camera.down
+      cam.down
       moving += 1
     }
 		if (keyCode == KeyEvent.VK_Q) {
 			System.exit(0)//this.rotation = !rotation;
 		}
-    if (keyCode == KeyEvent.VK_BACK_QUOTE) Camera.initialPosition()
+    if (keyCode == KeyEvent.VK_BACK_QUOTE) cam.initialPosition()
 
-		if (keyCode == KeyEvent.VK_UP) { Camera.lookUp; looking+=1 }
-		if (keyCode == KeyEvent.VK_DOWN) { Camera.lookDown; looking+=1 }
-		if (keyCode == KeyEvent.VK_LEFT) { Camera.lookLeft; looking+=1 }
-		if (keyCode == KeyEvent.VK_RIGHT) { Camera.lookRight; looking+=1 }
+		if (keyCode == KeyEvent.VK_UP) { cam.lookUp; looking+=1 }
+		if (keyCode == KeyEvent.VK_DOWN) { cam.lookDown; looking+=1 }
+		if (keyCode == KeyEvent.VK_LEFT) { cam.lookLeft; looking+=1 }
+		if (keyCode == KeyEvent.VK_RIGHT) { cam.lookRight; looking+=1 }
 
 	}
 
@@ -63,10 +65,10 @@ object NavInput extends KeyMouseListener {
 		val k = e.getKeyCode();
 
 		if (k == KeyEvent.VK_W || k == KeyEvent.VK_S || k == KeyEvent.VK_A || k == KeyEvent.VK_D || k == KeyEvent.VK_SPACE || k == KeyEvent.VK_SHIFT) {
-      Camera.stop
+      cam.stop
 		}
 		if (k == KeyEvent.VK_LEFT || k == KeyEvent.VK_RIGHT || k == KeyEvent.VK_UP || k == KeyEvent.VK_DOWN) {
-      Camera.stopLook
+      cam.stopLook
 		}
 	}
 
@@ -86,8 +88,8 @@ object NavInput extends KeyMouseListener {
 		val y = e.getY();
     println( x + " " + y )
 
-    val e = Camera.position
-    val v = Camera.projectPoint( x, y )
+    val e = cam.position
+    val v = cam.projectPoint( x, y )
     println( v )
    
     val r = new Ray( e, v-e )
