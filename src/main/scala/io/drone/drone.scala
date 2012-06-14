@@ -24,6 +24,11 @@ object Drone {
   var dest = Vec3(0)
   var yaw = 0.f
   var destYaw = 0.f
+  var dwThresh = 20.f
+  var dpThresh = .33f
+  var speed = .1f
+  var vSpeed = .1f
+  var rotSpeed = .9f
   //init()
 
   def init( ) = {
@@ -44,7 +49,7 @@ object Drone {
   }
 
   def connect() = drone.connect
-  def disconnect() = drone.disconnect
+  def disconnect() = { drone.disconnect; Thread.sleep(1000); drone = null }
   def clearEmergency() = drone.clearEmergencySignal
   def trim() = drone.trim
   def takeOff() = { drone.takeOff; flying = true;}
@@ -77,9 +82,9 @@ object Drone {
     var dw = destYaw - yaw
     if( dw > 180.f ) dw -= 360.f 
     if( dw < -180.f ) dw += 360.f 
-    if( math.abs(dw) > 20.f ){
-      var r = .3f
-      if( dw < 0.f) r = -.3f
+    if( math.abs(dw) > dwThresh ){
+      var r = rotSpeed //.3f
+      if( dw < 0.f) r = -rotSpeed //.3f
       Drone.move(0,0,0,r)
       return null
     }
@@ -90,13 +95,13 @@ object Drone {
     val cos = math.cos(w*d2r)
     val sin = math.sin(w*d2r)
     val d = (dest - pos).normalize
-    var ud = d.y * .1f
+    var ud = d.y * vSpeed //.1f
     var fb = -d.x*cos - d.z*sin  //d.x*cos - d.z*sin
     var lr = -d.x*sin + d.z*cos  //-d.x*sin - d.z*cos
-    fb = fb * .1f
-    lr = lr * .1f
+    fb = fb * speed //.1f
+    lr = lr * speed //.1f
     //println("dp: " + dp + "  "+lr+" "+fb+" "+ud)
-    if( dp  > .33f ){
+    if( dp  > dpThresh ){
       Drone.move(lr.toFloat,fb.toFloat,ud,0)
     }else {
       Drone.hover
@@ -172,11 +177,17 @@ class DroneOSCControl( val port:Int) {
   rcv.action = {
     case(Message( "/drone/connect", _ @ _*), _) => Drone.init
     case(Message( "/drone/disconnect", _ @ _*), _) => Drone.disconnect
+    case(Message( "/drone/clearEmergency", _ @ _*), _) => Drone.clearEmergency
     case(Message( "/drone/takeoff", _ @ _*), _) => println("TAKEOFF!"); Drone.takeOff
     case(Message( "/drone/land", _ @ _*), _) => println("LAND!"); Drone.land
     case(Message( "/drone/move", a:Float,b:Float,c:Float,d:Float ), _) => println("MOVE: " + a + " " + b + " " + c + " " + d); Drone.move(a,b,c,d)
     case(Message( "/drone/moveto", x:Float,y:Float,z:Float,w:Float ), _) => Drone.moveTo(x,y,z,w); //println("MOVE_TO: "+x+" "+y+" "+z+" "+w)
     case(Message( "/drone/setposh", x:Float,y:Float,z:Float,w:Float ), _) => Drone.step(Vec3(x,y,z),w); //println("pos: "+x+" "+y+" "+z+" "+w)
+    case(Message( "/drone/setSpeed", s:Float ), _) => Drone.speed = s; if(s<0.f) Drone.speed=0.f; if(s>1.f) Drone.speed=1.f;
+    case(Message( "/drone/setVSpeed", s:Float ), _) => Drone.vSpeed = s; if(s<0.f) Drone.vSpeed=0.f; if(s>1.f) Drone.vSpeed=1.f;
+    case(Message( "/drone/setRotSpeed", s:Float ), _) => Drone.rotSpeed = s; if(s<0.f) Drone.rotSpeed=0.f; if(s>1.f) Drone.rotSpeed=1.f;
+    case(Message( "/drone/setThresh", s:Float ), _) => Drone.dpThresh = s; if(s<0.f) Drone.dpThresh=0.f; if(s>1.f) Drone.dpThresh=1.f;
+    case(Message( "/drone/setRotThresh", s:Float ), _) => Drone.dwThresh = s; if(s<0.f) Drone.dwThresh=0.f; if(s>180.f) Drone.dwThresh=180.f;
     case(Message( "/drone/hover", _ @ _*), _) => println("HOVEr!"); Drone.hover
     case(Message( name, f @ _*), _) => null
 
