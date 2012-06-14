@@ -25,6 +25,7 @@ class Fabric( var pos:Vec3=Vec3(0), var width:Float=1.f, var height:Float=1.f, v
 
   var stiff = 1.f
   var particles = ListBuffer[VParticle]()
+  var field:VecField3D = null
 
   val nx = (width / dist).toInt
   val ny = (height / dist).toInt
@@ -56,6 +57,7 @@ class Fabric( var pos:Vec3=Vec3(0), var width:Float=1.f, var height:Float=1.f, v
 
     //for( t <- (0 until steps)){
       for( s <- (0 until 3) ) particles.foreach( _.solve() )
+      if( field != null ) particles.foreach( (p:VParticle) => { p.applyForce( field(p.pos) ) } )
       particles.foreach( _.step(dt) )
     //}
 
@@ -64,6 +66,7 @@ class Fabric( var pos:Vec3=Vec3(0), var width:Float=1.f, var height:Float=1.f, v
   override def onDraw( gl: GL2) = particles.foreach( _.onDraw(gl) )
   def applyForce( f: Vec3 ) = particles.foreach( _.applyForce(f) )
 
+  def addField( f: VecField3D ) = field = f
 
 }
 
@@ -111,7 +114,7 @@ class VParticle {
     }
   }
 
-  def applyForce( f: Vec3 ) = accel += f / mass
+  def applyForce( f: Vec3 ) = accel += (f / mass)
 
   def solve() : Unit = {
     links.foreach( (n) => {

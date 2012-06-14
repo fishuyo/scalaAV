@@ -8,10 +8,12 @@ import javax.media.opengl._
 /**
 * Camera
 */
-object Camera extends Camera
+object Camera extends Camera(Vec3(0,0,2),0.f)
 
-class Camera {
+class Camera( var position:Vec3=Vec3(0,0,2), az:Float=0.f ) {
 
+  val initPos = position + Vec3(0)
+  val initDir = az
   val rad = scala.math.Pi / 180.f 
   
   var fovy = 60.f
@@ -25,13 +27,11 @@ class Camera {
   var v = 2.f
   var a = 90.f
   
-  var position = Vec3(0,0,2)
   var velocity = Vec3(0,0,0)
-  var direction = Vec3(0,0,0)
   var upDirection = Vec3(0,1,0)
 
   var elevation=0.0f
-  var azimuth=0.0f
+  var azimuth=az
   var roll=0.0f
   var w = Vec3( 0,0,0 ) //angluar velocity
 
@@ -57,7 +57,7 @@ class Camera {
     Vec3( width*(x-300.f+0.5)/300.f, height*(300.f-y+0.5f)/300.f, position.z - near)
   }
 
-  def initialPosition() = { position = Vec3(0,0,2); elevation=0.f; azimuth=0.f }
+  def initialPosition() = { position = initPos; elevation=0.f; azimuth=initDir }
   def forward() = velocity = Vec3( math.sin( azimuth * rad),0, -math.cos(azimuth*rad) ).normalize * v
   def backward() = velocity = Vec3( math.sin( (180.f + azimuth) * rad),0, -math.cos((180.f+azimuth)*rad) ).normalize * v
   def left() = velocity = Vec3( math.sin( (270.f + azimuth) * rad),0, -math.cos((270.f+azimuth)*rad) ).normalize * v

@@ -38,6 +38,9 @@ class VecField3D( var n:Int, c:Vec3=Vec3(0), halfsize:Float=1.f)  extends AABB(c
   }
   def set(x:Int,y:Int,z:Int, v:Vec3) = data(z*n*n + y*n + x) = v
   def set(i:Int, v:Vec3) = data(i) = v
+  def sset(x:Int,y:Int,z:Int, v:Vec3)= if(!(x<0||x>=n||y<0||y>=n||z<0||z>=n)) data(z*n*n + y*n + x) = v
+
+  def clear = for( i<-(0 until n*n*n)) set(i, Vec3(0))
 
   def binAt( v:Vec3 ):Option[Vec3] = {
     if( !contains(v) ) None

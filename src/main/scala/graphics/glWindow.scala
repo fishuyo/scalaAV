@@ -19,11 +19,11 @@ import com.jogamp.opengl.util._
 import com.jogamp.opengl.util.awt.Screenshot
 import javax.media.opengl.fixedfunc.{GLLightingFunc => L}
 
-class GLRenderWindow extends GLEventListener{
+class GLRenderWindow( var scene:GLScene=GLScene, var camera:Camera=Camera ) extends GLEventListener{
   
-  var scene = GLScene
-  var camera = Camera
-  var input = NavInput
+  //var scene = GLScene
+  //var camera = Camera
+  var input = new NavInput(camera)
   var name = "scalaAV"
   var w=600
   var h=600
